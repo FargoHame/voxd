@@ -1,0 +1,30 @@
+[project]
+name = "voxd"
+version = "0.1.0"
+description = "A local runtime for modern speech AI."
+readme = "README.md"
+requires-python = ">=3.11,<3.14"
+
+dependencies = [
+    "fastapi>=0.116.0",
+    "uvicorn[standard]>=0.35.0",
+    "typer>=0.16.0",
+    "rich>=14.0.0",
+    "httpx>=0.28.0",
+    "pydantic>=2.11.0",
+    "pydantic-settings>=2.10.0",
+]
+
+[project.scripts]
+voxd = "voxd.cli:cli"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.0",
+    "ruff>=0.12.0",
+    "black>=25.1.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
