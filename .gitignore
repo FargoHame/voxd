@@ -10,7 +10,10 @@ __pycache__/
 venv/
 env/
 
-# Python build artifacts
+# uv
+.python-version
+
+# Build artifacts
 build/
 dist/
 *.egg-info/
@@ -20,18 +23,18 @@ dist/
 .coverage
 htmlcov/
 
-# Type checkers
+# Type checking
 .mypy_cache/
 .pyre/
 .pytype/
 
-# Linting
+# Ruff
 .ruff_cache/
 
 # Jupyter
 .ipynb_checkpoints/
 
-# Environment variables
+# Environment
 .env
 .env.*
 
@@ -45,9 +48,13 @@ htmlcov/
 # Windows
 Thumbs.db
 
-# Runtime outputs
+# Logs
+*.log
+
+# Runtime generated data
 runtime/data/cache/
 runtime/data/outputs/
 
-# Logs
-*.log
+# Node (future Next.js app)
+node_modules/
+.next/
