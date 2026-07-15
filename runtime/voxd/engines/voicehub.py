@@ -3,7 +3,8 @@ from __future__ import annotations
 from pathlib import Path
 
 from voxd.engines.base import SpeechEngine
-from voxd.models.model_file import ModelFile
+from voxd.manifests.base import ManifestProvider
+from voxd.manifests.local import LocalManifestProvider
 from voxd.models.model_info import ModelInfo
 from voxd.models.model_manifest import ModelManifest
 
@@ -11,44 +12,26 @@ from voxd.models.model_manifest import ModelManifest
 class VoiceHubEngine(SpeechEngine):
     """VoiceHub speech engine."""
 
+    def __init__(self, manifest_provider: ManifestProvider | None = None):
+        self._manifest_provider = (
+            manifest_provider
+            or LocalManifestProvider(
+                Path(__file__).parent.parent
+                / "manifests"
+                / "catalog"
+                / "voicehub.json"
+            )
+        )
+
     @property
     def name(self) -> str:
         return "voicehub"
 
     def available_models(self) -> list[ModelInfo]:
-        return [
-            ModelInfo(
-                name="kokoro",
-                engine="voicehub",
-                description="Fast lightweight English TTS model",
-                size_bytes=123_456_789,
-                version="1.0",
-                license="Apache-2.0",
-            )
-        ]
+        return self._manifest_provider.available_models()
 
     def get_manifest(self, model_name: str) -> ModelManifest:
-        if model_name != "kokoro":
-            raise ValueError(f"Unknown model: {model_name}")
-
-        files = [
-            ModelFile(
-                filename="model.safetensors",
-                url="https://example.com/model.safetensors",
-                sha256="dummyhash",
-                size_bytes=123_456_789,
-            )
-        ]
-
-        return ModelManifest(
-            model_name="kokoro",
-            engine="voicehub",
-            version="1.0",
-            files=files,
-            total_size=sum(file.size_bytes for file in files),
-            license="Apache-2.0",
-            homepage="https://huggingface.co/hexgrad/Kokoro-82M",
-        )
+        return self._manifest_provider.get_manifest(model_name)
 
     def load(self, model_path: Path) -> None:
         raise NotImplementedError
@@ -60,7 +43,11 @@ class VoiceHubEngine(SpeechEngine):
         raise NotImplementedError
 
     def capabilities(self) -> dict:
-        return {}
+        return {
+            "streaming": False,
+            "voice_cloning": False,
+            "multi_speaker": False,
+        }
 
     def health(self) -> bool:
         return True

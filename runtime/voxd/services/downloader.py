@@ -7,6 +7,8 @@ from pathlib import Path
 import httpx
 
 from voxd.models.model_file import ModelFile
+from voxd.core.settings import settings
+from voxd.models.model_manifest import ModelManifest
 
 
 class Downloader:
@@ -41,3 +43,10 @@ class Downloader:
                 sha256.update(chunk)
 
         return sha256.hexdigest() == expected_sha256
+    def prepare_download(self, manifest: ModelManifest) -> Path:
+        """Create the installation directory for a model."""
+
+        model_dir = settings.models_dir / manifest.model_name
+        model_dir.mkdir(parents=True, exist_ok=True)
+
+        return model_dir

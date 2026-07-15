@@ -1,0 +1,20 @@
+{
+  "models": [
+    {
+      "name": "kokoro",
+      "engine": "voicehub",
+      "description": "Fast lightweight English TTS model",
+      "version": "1.0",
+      "license": "Apache-2.0",
+      "homepage": "https://huggingface.co/hexgrad/Kokoro-82M",
+      "files": [
+        {
+          "filename": "model.safetensors",
+          "url": "https://example.com/model.safetensors",
+          "sha256": "dummyhash",
+          "size_bytes": 123456789
+        }
+      ]
+    }
+  ]
+}
