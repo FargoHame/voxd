@@ -1,11 +1,14 @@
 from __future__ import annotations
 from pathlib import Path
+import shutil
+from datetime import datetime
 
 from voxd.models.model_manifest import ModelManifest
 from voxd.engines.registry import EngineRegistry
 from voxd.models.installed_model import InstalledModel
 from voxd.storage.model_registry import ModelRegistry
 from voxd.services.downloader import Downloader
+from voxd.constants.install_status import InstallStatus
 
 class ModelManager:
     """Coordinates model management across engines and storage."""
@@ -54,7 +57,35 @@ class ModelManager:
         return engine.get_manifest(model_name)
     def prepare_install(self, engine_name: str, model_name: str) -> Path:
         """Prepare a model installation directory."""
-
+        
         manifest = self.pull(engine_name, model_name)
 
-        return self._downloader.prepare_download(manifest)
+        install_dir = self._downloader.prepare_download(manifest)
+
+        self._downloader.download_manifest(
+            manifest,
+            install_dir,
+        )
+
+        if not self._downloader.verify_manifest(
+            manifest,
+            install_dir,
+        ):
+            shutil.rmtree(install_dir)
+            raise ValueError("Downloaded files failed SHA-256 verification.")
+
+        installed_model = InstalledModel(
+            model_name=manifest.model_name,
+            engine=manifest.engine,
+            version=manifest.version,
+            install_path=install_dir,
+            size_bytes=manifest.total_size,
+            manifest_version=manifest.version,
+            installed_at=datetime.now(),
+            last_used=None,
+            status=InstallStatus.INSTALLED,
+        )
+
+        self._models.add(installed_model)
+
+        return install_dir

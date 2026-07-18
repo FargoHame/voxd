@@ -51,9 +51,8 @@ Thumbs.db
 # Logs
 *.log
 
-# Runtime generated data
-runtime/data/cache/
-runtime/data/outputs/
+# Runtime data
+runtime/data/
 
 # Node (future Next.js app)
 node_modules/
