@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from voxd.schemas.health import HealthResponse
+from voxd.models.health import HealthResponse
 
 router = APIRouter(tags=["Health"])
 

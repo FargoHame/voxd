@@ -5,7 +5,7 @@ from voxd.api.version import router as version_router
 from voxd.core.lifespan import lifespan
 from voxd.core.logger import configure_logging
 from voxd.core.settings import settings
-
+from voxd.api.runtime import router as runtime_router
 
 def create_app() -> FastAPI:
     """Create and configure the FastAPI application."""
@@ -19,6 +19,11 @@ def create_app() -> FastAPI:
     )
 
     api_prefix = f"/{settings.api_version}"
+
+    app.include_router(
+        runtime_router,
+        prefix=api_prefix,
+    )
 
     app.include_router(
         health_router,

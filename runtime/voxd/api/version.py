@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from voxd.schemas.version import VersionResponse
+from voxd.models.version import VersionResponse
 
 router = APIRouter(tags=["Version"])
 
