@@ -1,14 +1,17 @@
 from __future__ import annotations
-from pathlib import Path
+
 import shutil
 from datetime import datetime
+from pathlib import Path
 
-from voxd.models.model_manifest import ModelManifest
+from voxd.constants.install_status import InstallStatus
+from voxd.engines.base import SpeechEngine
 from voxd.engines.registry import EngineRegistry
 from voxd.models.installed_model import InstalledModel
-from voxd.storage.model_registry import ModelRegistry
+from voxd.models.model_manifest import ModelManifest
 from voxd.services.downloader import Downloader
-from voxd.constants.install_status import InstallStatus
+from voxd.storage.model_registry import ModelRegistry
+
 
 class ModelManager:
     """Coordinates model management across engines and storage."""
@@ -23,41 +26,47 @@ class ModelManager:
         self._models = model_registry or ModelRegistry()
         self._downloader = downloader or Downloader()
 
+        self._loaded_engine: SpeechEngine | None = None
+        self._loaded_model: InstalledModel | None = None
+
     def available_models(self, engine: str) -> list:
-        """Return models available from an engine."""
         return self._engines.get(engine).available_models()
 
     def installed_models(self) -> list[InstalledModel]:
-        """Return installed models."""
         return self._models.list()
 
     def is_installed(self, model_name: str) -> bool:
-        """Check whether a model is installed."""
         return self._models.exists(model_name)
 
     def get_installed_model(
         self,
         model_name: str,
     ) -> InstalledModel | None:
-        """Return an installed model."""
         return self._models.get(model_name)
 
     def remove(self, model_name: str) -> None:
-        """Remove a model from the registry."""
         self._models.remove(model_name)
 
-    def pull(self, engine_name: str, model_name: str) -> ModelManifest:
-        """Prepare a model for installation."""
-
+    def pull(
+        self,
+        engine_name: str,
+        model_name: str,
+    ) -> ModelManifest:
         engine = self._engines.get(engine_name)
 
         if self._models.exists(model_name):
-            raise ValueError(f"Model '{model_name}' is already installed.")
+            raise ValueError(
+                f"Model '{model_name}' is already installed."
+            )
 
         return engine.get_manifest(model_name)
-    def prepare_install(self, engine_name: str, model_name: str) -> Path:
-        """Prepare a model installation directory."""
-        
+
+    def prepare_install(
+        self,
+        engine_name: str,
+        model_name: str,
+    ) -> Path:
+
         manifest = self.pull(engine_name, model_name)
 
         install_dir = self._downloader.prepare_download(manifest)
@@ -72,7 +81,9 @@ class ModelManager:
             install_dir,
         ):
             shutil.rmtree(install_dir)
-            raise ValueError("Downloaded files failed SHA-256 verification.")
+            raise ValueError(
+                "Downloaded files failed SHA-256 verification."
+            )
 
         installed_model = InstalledModel(
             model_name=manifest.model_name,
@@ -89,3 +100,70 @@ class ModelManager:
         self._models.add(installed_model)
 
         return install_dir
+
+    def load(
+        self,
+        model_name: str,
+    ) -> InstalledModel:
+        """Load an installed model into its engine."""
+
+        model = self._models.get(model_name)
+
+        if model is None:
+            raise ValueError(f"Model '{model_name}' is not installed.")
+
+        engine = self._engines.get(model.engine)
+
+        manifest = engine.get_manifest(model.model_name)
+
+        engine.load(
+            model=model,
+            manifest=manifest,
+        )
+        self._loaded_engine = engine
+        self._loaded_model = model
+        
+        model.last_used = datetime.now()
+
+        self._models.update(model)
+
+        return model
+
+    def unload(self) -> None:
+        """Unload the currently loaded model."""
+
+        if self._loaded_engine is None:
+            return
+
+        self._loaded_engine.unload()
+
+        self._loaded_engine = None
+        self._loaded_model = None
+
+    def loaded_model(self) -> InstalledModel | None:
+        """Return the currently loaded model."""
+
+        for engine in self._engines.list():
+            model = engine.loaded_model()
+
+            if model is not None:
+                return model
+
+        return None
+
+    def synthesize(
+        self,
+        text: str,
+        **kwargs,
+    ) -> bytes:
+        """Generate speech using the loaded model."""
+
+        if self._loaded_engine is None:
+            raise RuntimeError(
+                "No model is currently loaded."
+            )
+
+        return self._loaded_engine.synthesize(
+            text=text,
+            **kwargs,
+        )

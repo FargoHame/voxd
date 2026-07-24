@@ -91,7 +91,7 @@ class ModelRegistry:
                 (model_name,),
             )
 
-    def update_model(self, model: InstalledModel) -> None:
+    def update(self, model: InstalledModel) -> None:
         self.add(model)
 
     @staticmethod

@@ -1,11 +1,10 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from pathlib import Path
 
 from voxd.models.model_info import ModelInfo
 from voxd.models.model_manifest import ModelManifest
-
+from voxd.models.installed_model import InstalledModel
 
 class SpeechEngine(ABC):
     """Abstract interface for all speech engines."""
@@ -27,7 +26,10 @@ class SpeechEngine(ABC):
         ...
 
     @abstractmethod
-    def load(self, model_path: Path) -> None:
+    def load(self, 
+             model: InstalledModel,
+             manifest: ModelManifest,
+        ) -> None:
         """Load a model into memory."""
         ...
 
@@ -49,4 +51,9 @@ class SpeechEngine(ABC):
     @abstractmethod
     def health(self) -> bool:
         """Return engine health."""
+        ...
+        
+    @abstractmethod
+    def loaded_model(self) -> InstalledModel | None:
+        """Return the currently loaded model."""
         ...
