@@ -3,6 +3,7 @@ import typer
 import uvicorn
 
 from voxd.core.settings import settings
+from voxd.services.model_manager import ModelManager
 
 cli = typer.Typer(
     help="Voxd Runtime CLI",
@@ -83,6 +84,41 @@ def unload():
     response.raise_for_status()
 
     typer.echo("Runtime unloaded.")
+
+
+@cli.command()
+def pull(model: str):
+    """Download and install a model from the catalog."""
+
+    mgr = ModelManager()
+    mgr.prepare_install("voicehub", model)
+    typer.echo(f"Model '{model}' installed.")
+
+
+@cli.command()
+def list():
+    """List installed models."""
+
+    mgr = ModelManager()
+    models = mgr.installed_models()
+
+    if not models:
+        typer.echo("No models installed.")
+        return
+
+    for m in models:
+        typer.echo(
+            f"  {m.model_name:<20} {m.engine:<10} {m.size_bytes:>10,} bytes"
+        )
+
+
+@cli.command()
+def rm(model: str):
+    """Remove an installed model and its files."""
+
+    mgr = ModelManager()
+    mgr.remove(model)
+    typer.echo(f"Model '{model}' removed.")
 
 
 if __name__ == "__main__":

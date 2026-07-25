@@ -45,6 +45,15 @@ class ModelManager:
         return self._models.get(model_name)
 
     def remove(self, model_name: str) -> None:
+        """Remove an installed model from the registry and delete its files."""
+
+        # Unload first if this model is currently loaded.
+        if self._loaded_model is not None and self._loaded_model.model_name == model_name:
+            self.unload()
+
+        model = self._models.get(model_name)
+        if model is not None and model.install_path.exists():
+            shutil.rmtree(model.install_path)
         self._models.remove(model_name)
 
     def pull(
@@ -105,7 +114,20 @@ class ModelManager:
         self,
         model_name: str,
     ) -> InstalledModel:
-        """Load an installed model into its engine."""
+        """Load an installed model into its engine.
+
+        Idempotent: if the requested model is already loaded, returns it
+        without re-initializing the engine.
+        """
+
+        if (
+            self._loaded_model is not None
+            and self._loaded_model.model_name == model_name
+        ):
+            return self._loaded_model
+
+        if self._loaded_model is not None:
+            self.unload()
 
         model = self._models.get(model_name)
 
@@ -122,7 +144,7 @@ class ModelManager:
         )
         self._loaded_engine = engine
         self._loaded_model = model
-        
+
         model.last_used = datetime.now()
 
         self._models.update(model)
@@ -142,14 +164,7 @@ class ModelManager:
 
     def loaded_model(self) -> InstalledModel | None:
         """Return the currently loaded model."""
-
-        for engine in self._engines.list():
-            model = engine.loaded_model()
-
-            if model is not None:
-                return model
-
-        return None
+        return self._loaded_model
 
     def synthesize(
         self,
