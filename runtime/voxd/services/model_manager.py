@@ -5,6 +5,7 @@ from datetime import datetime
 from pathlib import Path
 
 from voxd.constants.install_status import InstallStatus
+from voxd.core.settings import settings
 from voxd.engines.base import SpeechEngine
 from voxd.engines.registry import EngineRegistry
 from voxd.models.audio import AudioResult, SpeechRequest
@@ -94,11 +95,18 @@ class ModelManager:
             shutil.rmtree(install_dir)
             raise ValueError("Downloaded files failed SHA-256 verification.")
 
+        final_dir = self._install_dir(manifest.model_name)
+        if final_dir.exists():
+            shutil.rmtree(final_dir)
+
+        final_dir.parent.mkdir(parents=True, exist_ok=True)
+        shutil.move(str(install_dir), str(final_dir))
+
         installed_model = InstalledModel(
             model_name=manifest.model_name,
             engine=manifest.engine,
             version=manifest.version,
-            install_path=install_dir,
+            install_path=final_dir,
             size_bytes=manifest.total_size,
             manifest_version=manifest.version,
             installed_at=datetime.now(),
@@ -108,7 +116,7 @@ class ModelManager:
 
         self._models.add(installed_model)
 
-        return install_dir
+        return final_dir
 
     def load(
         self,
@@ -173,3 +181,7 @@ class ModelManager:
             raise RuntimeError("No model is currently loaded.")
 
         return self._loaded_engine.synthesize(request)
+
+    @staticmethod
+    def _install_dir(model_name: str) -> Path:
+        return settings.models_dir / model_name

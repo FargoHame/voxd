@@ -47,9 +47,11 @@ class Downloader:
         return actual.casefold() == expected_sha256.casefold()
 
     def prepare_download(self, manifest: ModelManifest) -> Path:
-        """Create the installation directory for a model."""
+        """Create the staging directory for a model download."""
 
-        model_dir = settings.models_dir / manifest.model_name
+        model_dir = settings.cache_dir / "downloads" / manifest.model_name
+        if model_dir.exists():
+            shutil.rmtree(model_dir)
         model_dir.mkdir(parents=True, exist_ok=True)
 
         return model_dir
