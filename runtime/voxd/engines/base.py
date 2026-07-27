@@ -2,9 +2,11 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
+from voxd.models.audio import AudioResult, SpeechRequest
 from voxd.models.model_info import ModelInfo
 from voxd.models.model_manifest import ModelManifest
 from voxd.models.installed_model import InstalledModel
+
 
 class SpeechEngine(ABC):
     """Abstract interface for all speech engines."""
@@ -26,10 +28,11 @@ class SpeechEngine(ABC):
         ...
 
     @abstractmethod
-    def load(self, 
-             model: InstalledModel,
-             manifest: ModelManifest,
-        ) -> None:
+    def load(
+        self,
+        model: InstalledModel,
+        manifest: ModelManifest,
+    ) -> None:
         """Load a model into memory."""
         ...
 
@@ -39,7 +42,7 @@ class SpeechEngine(ABC):
         ...
 
     @abstractmethod
-    def synthesize(self, text: str, **kwargs) -> bytes:
+    def synthesize(self, request: SpeechRequest) -> AudioResult:
         """Run text-to-speech."""
         ...
 
@@ -52,7 +55,7 @@ class SpeechEngine(ABC):
     def health(self) -> bool:
         """Return engine health."""
         ...
-        
+
     @abstractmethod
     def loaded_model(self) -> InstalledModel | None:
         """Return the currently loaded model."""

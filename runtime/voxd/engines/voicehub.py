@@ -2,14 +2,14 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from voicehub.automodel import AutoInferenceModel
-
 from voxd.engines.base import SpeechEngine
 from voxd.manifests.base import ManifestProvider
 from voxd.manifests.local import LocalManifestProvider
+from voxd.models.audio import AudioResult, SpeechRequest
 from voxd.models.model_info import ModelInfo
 from voxd.models.model_manifest import ModelManifest
 from voxd.models.installed_model import InstalledModel
+from voxd.services.audio import encode_wav
 
 
 class VoiceHubEngine(SpeechEngine):
@@ -19,14 +19,8 @@ class VoiceHubEngine(SpeechEngine):
         self._loaded_model: InstalledModel | None = None
         self._tts_model = None
 
-        self._manifest_provider = (
-            manifest_provider
-            or LocalManifestProvider(
-                Path(__file__).parent.parent
-                / "manifests"
-                / "catalog"
-                / "voicehub.json"
-            )
+        self._manifest_provider = manifest_provider or LocalManifestProvider(
+            Path(__file__).parent.parent / "manifests" / "catalog" / "voicehub.json"
         )
 
     @property
@@ -51,6 +45,14 @@ class VoiceHubEngine(SpeechEngine):
                 f"Model directory does not exist: {model.install_path}"
             )
 
+        try:
+            from voicehub.automodel import AutoInferenceModel
+        except ImportError as exc:
+            raise RuntimeError(
+                "VoiceHub is not installed. Install Voxd with the VoiceHub "
+                "engine extra, or install the VoiceHub package in this environment."
+            ) from exc
+
         self._tts_model = AutoInferenceModel.from_pretrained(
             model_type=model.model_name,
             model_path=str(model.install_path),
@@ -65,14 +67,28 @@ class VoiceHubEngine(SpeechEngine):
         self._tts_model = None
         self._loaded_model = None
 
-    def synthesize(self, text: str, **kwargs):
+    def synthesize(self, request: SpeechRequest) -> AudioResult:
         if self._tts_model is None:
             raise RuntimeError("No model loaded.")
 
-        return self._tts_model.synthesize(
-            text=text,
-            **kwargs,
-        )
+        kwargs = dict(request.options)
+        if request.voice is not None:
+            kwargs["voice"] = request.voice
+        if request.speed is not None:
+            kwargs["speed"] = request.speed
+
+        audio = self._call_loaded_model(request.input, kwargs)
+        sample_rate = getattr(self._tts_model, "sample_rate", 24000)
+
+        return encode_wav(audio, sample_rate=sample_rate)
+
+    def _call_loaded_model(self, text: str, kwargs: dict):
+        model_name = self._loaded_model.model_name if self._loaded_model else ""
+
+        if model_name in {"orpheustts", "dia"}:
+            return self._tts_model.synthesize(prompt=text, **kwargs)
+
+        return self._tts_model.synthesize(text=text, **kwargs)
 
     def capabilities(self) -> dict:
         return {
@@ -83,7 +99,7 @@ class VoiceHubEngine(SpeechEngine):
 
     def health(self) -> bool:
         return True
-    
+
     def loaded_model(self) -> InstalledModel | None:
         """Return the currently loaded model."""
 

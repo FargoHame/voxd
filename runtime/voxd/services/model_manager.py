@@ -7,6 +7,7 @@ from pathlib import Path
 from voxd.constants.install_status import InstallStatus
 from voxd.engines.base import SpeechEngine
 from voxd.engines.registry import EngineRegistry
+from voxd.models.audio import AudioResult, SpeechRequest
 from voxd.models.installed_model import InstalledModel
 from voxd.models.model_manifest import ModelManifest
 from voxd.services.downloader import Downloader
@@ -48,7 +49,10 @@ class ModelManager:
         """Remove an installed model from the registry and delete its files."""
 
         # Unload first if this model is currently loaded.
-        if self._loaded_model is not None and self._loaded_model.model_name == model_name:
+        if (
+            self._loaded_model is not None
+            and self._loaded_model.model_name == model_name
+        ):
             self.unload()
 
         model = self._models.get(model_name)
@@ -64,9 +68,7 @@ class ModelManager:
         engine = self._engines.get(engine_name)
 
         if self._models.exists(model_name):
-            raise ValueError(
-                f"Model '{model_name}' is already installed."
-            )
+            raise ValueError(f"Model '{model_name}' is already installed.")
 
         return engine.get_manifest(model_name)
 
@@ -90,9 +92,7 @@ class ModelManager:
             install_dir,
         ):
             shutil.rmtree(install_dir)
-            raise ValueError(
-                "Downloaded files failed SHA-256 verification."
-            )
+            raise ValueError("Downloaded files failed SHA-256 verification.")
 
         installed_model = InstalledModel(
             model_name=manifest.model_name,
@@ -166,19 +166,10 @@ class ModelManager:
         """Return the currently loaded model."""
         return self._loaded_model
 
-    def synthesize(
-        self,
-        text: str,
-        **kwargs,
-    ) -> bytes:
+    def synthesize(self, request: SpeechRequest) -> AudioResult:
         """Generate speech using the loaded model."""
 
         if self._loaded_engine is None:
-            raise RuntimeError(
-                "No model is currently loaded."
-            )
+            raise RuntimeError("No model is currently loaded.")
 
-        return self._loaded_engine.synthesize(
-            text=text,
-            **kwargs,
-        )
+        return self._loaded_engine.synthesize(request)

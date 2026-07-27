@@ -1,9 +1,10 @@
+from voxd.models.audio import SpeechRequest
+
+
 from pydantic import BaseModel
+
+__all__ = ["LoadRuntimeRequest", "SpeechRequest"]
 
 
 class LoadRuntimeRequest(BaseModel):
     model: str
-
-
-class SpeechRequest(BaseModel):
-    text: str

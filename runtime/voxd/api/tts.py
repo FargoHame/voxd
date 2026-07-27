@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Request, Response
 
-from voxd.models.runtime import SpeechRequest
+from voxd.models.audio import SpeechRequest
 
 router = APIRouter(tags=["Audio"])
 
@@ -12,9 +12,12 @@ def synthesize(
 ) -> Response:
     """Synthesize speech from text using the currently loaded model."""
 
-    audio = request.app.state.runtime.synthesize(body.text)
+    audio = request.app.state.runtime.synthesize(body)
 
     return Response(
-        content=audio,
-        media_type="audio/wav",
+        content=audio.data,
+        media_type=audio.media_type,
+        headers={
+            "X-Voxd-Sample-Rate": str(audio.sample_rate),
+        },
     )

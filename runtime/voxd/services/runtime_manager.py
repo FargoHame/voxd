@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from voxd.models.audio import AudioResult, SpeechRequest
 from voxd.services.model_manager import ModelManager
 from voxd.models.installed_model import InstalledModel
 
@@ -33,6 +34,6 @@ class RuntimeManager:
         """Return whether a model is currently loaded."""
         return self.current() is not None
 
-    def synthesize(self, text: str, **kwargs) -> bytes:
+    def synthesize(self, request: SpeechRequest) -> AudioResult:
         """Generate speech using the loaded model."""
-        return self._models.synthesize(text, **kwargs)
+        return self._models.synthesize(request)

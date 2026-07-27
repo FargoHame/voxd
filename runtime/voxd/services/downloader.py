@@ -3,7 +3,7 @@ from __future__ import annotations
 import hashlib
 import shutil
 from pathlib import Path
-import urllib.request
+
 import httpx
 
 from voxd.models.model_file import ModelFile
@@ -45,7 +45,7 @@ class Downloader:
         actual = sha256.hexdigest()
 
         return actual.casefold() == expected_sha256.casefold()
-    
+
     def prepare_download(self, manifest: ModelManifest) -> Path:
         """Create the installation directory for a model."""
 
@@ -53,7 +53,7 @@ class Downloader:
         model_dir.mkdir(parents=True, exist_ok=True)
 
         return model_dir
-    
+
     def download_manifest(self, manifest: ModelManifest, install_dir: Path) -> None:
         for file in manifest.files:
             print(f"Downloading: {file.filename}")
@@ -116,7 +116,6 @@ class Downloader:
             print(f"{model_file.filename}: {ok}")
 
             if not ok:
-                actual = hashlib.sha256(file_path.read_bytes()).hexdigest()
                 return False
 
         return True
