@@ -161,7 +161,7 @@ def pull(model: str):
     """Download and install a model from the catalog."""
 
     mgr = ModelManager()
-    mgr.prepare_install("voicehub", model)
+    mgr.install(model)
     typer.echo(f"Model '{model}' installed.")
 
 

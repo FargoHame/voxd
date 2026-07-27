@@ -1,26 +1,3 @@
 {
-  "models": [
-    {
-      "name": "kokoro",
-      "engine": "voicehub",
-      "description": "Fast lightweight English TTS model",
-      "version": "1.0",
-      "license": "Apache-2.0",
-      "homepage": "https://huggingface.co/hexgrad/Kokoro-82M",
-      "files": [
-        {
-          "filename": "config.json",
-          "url": "https://huggingface.co/hexgrad/Kokoro-82M/resolve/main/config.json",
-          "sha256": "5ABB01E2403B072BF03D04FDE160443E209D7A0DAD49A423BE15196B9B43C17F",
-          "size_bytes": 7630
-        },
-        {
-          "filename": "kokoro-v1_0.pth",
-          "url": "https://huggingface.co/hexgrad/Kokoro-82M/resolve/main/kokoro-v1_0.pth",
-          "sha256": "496DBA118D1A58F5F3DB2EFC88DBDC216E0483FC89FE6E47EE1F2C53F18AD1E4",
-          "size_bytes": 363000000
-        }
-      ]
-    }
-  ]
+  "models": []
 }

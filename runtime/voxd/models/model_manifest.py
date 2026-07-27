@@ -1,4 +1,5 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from typing import Any
 
 from voxd.models.model_file import ModelFile
 
@@ -14,3 +15,4 @@ class ModelManifest:
     total_size: int
     license: str
     homepage: str
+    options: dict[str, Any] = field(default_factory=dict)

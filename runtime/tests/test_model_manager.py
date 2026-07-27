@@ -23,6 +23,9 @@ class FakeEngineRegistry:
     def get(self, name: str) -> FakeEngine:
         return self.engine
 
+    def list(self) -> list[FakeEngine]:
+        return [self.engine]
+
 
 class FakeModelRegistry:
     def __init__(self):
@@ -118,3 +121,19 @@ def test_prepare_install_removes_failed_staging_dir(tmp_path, monkeypatch, manif
 
     assert not staging_dir.exists()
     assert not (tmp_path / "models" / "demo").exists()
+
+
+def test_install_resolves_engine_from_catalog(tmp_path, monkeypatch, manifest):
+    monkeypatch.setattr(settings, "models_dir", tmp_path / "models")
+
+    registry = FakeModelRegistry()
+    manager = ModelManager(
+        engine_registry=FakeEngineRegistry(manifest),
+        model_registry=registry,
+        downloader=FakeDownloader(tmp_path / "cache" / "downloads" / "demo"),
+    )
+
+    install_dir = manager.install("demo")
+
+    assert install_dir == tmp_path / "models" / "demo"
+    assert registry.get("demo").engine == "fake"

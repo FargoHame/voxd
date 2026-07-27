@@ -10,11 +10,10 @@ Install the runtime package from this directory:
 uv pip install -e .
 ```
 
-Install the current VoiceHub backend from the repository commit that matches
-Voxd's adapter:
+Install the current Kokoro backend:
 
 ```powershell
-uv pip install "voicehub @ git+https://github.com/kadirnar/voicehub.git@2c081336cee7110a97a8501496c65777a76586d7"
+uv pip install kokoro
 ```
 
 Start the server:
@@ -26,6 +25,7 @@ voxd serve
 Generate speech through the running server:
 
 ```powershell
+voxd pull kokoro
 voxd run kokoro "Hello from Voxd" --voice af_heart --output hello.wav
 ```
 
@@ -76,6 +76,6 @@ pip install "voxd[chatterbox]"
 pip install "voxd[voicehub]"
 ```
 
-VoiceHub temporarily uses a Git dependency pinned to the repository commit that
-matches Voxd's adapter. Once PyPI contains the required API, this should move
-back to a normal `voicehub>=...` version constraint.
+VoiceHub can remain available as a compatibility backend. If PyPI is behind the
+repository API required by Voxd, install it from a pinned Git commit until PyPI
+catches up.

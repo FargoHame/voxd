@@ -12,7 +12,7 @@ def list_models(
     """List available models and their install status."""
 
     models = request.app.state.model_manager
-    available = models.available_models("voicehub")
+    available = models.available_models()
     installed = {m.model_name for m in models.installed_models()}
 
     return {
@@ -41,10 +41,7 @@ def pull_model(
     model_name = body.model
 
     try:
-        request.app.state.model_manager.prepare_install(
-            "voicehub",
-            model_name,
-        )
+        request.app.state.model_manager.install(model_name)
     except ValueError as exc:
         raise HTTPException(status_code=409, detail=str(exc)) from exc
 

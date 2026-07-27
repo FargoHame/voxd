@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from voxd.engines.base import SpeechEngine
+from voxd.engines.kokoro import KokoroEngine
 from voxd.engines.voicehub import VoiceHubEngine
 
 
@@ -9,6 +10,7 @@ class EngineRegistry:
 
     def __init__(self) -> None:
         self._engines: dict[str, SpeechEngine] = {}
+        self.register(KokoroEngine())
         self.register(VoiceHubEngine())
 
     def register(self, engine: SpeechEngine) -> None:

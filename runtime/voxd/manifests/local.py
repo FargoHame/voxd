@@ -58,6 +58,7 @@ class LocalManifestProvider(ManifestProvider):
                     total_size=sum(f.size_bytes for f in files),
                     license=model["license"],
                     homepage=model["homepage"],
+                    options=model.get("options", {}),
                 )
 
         raise ValueError(f"Unknown model: {model_name}")

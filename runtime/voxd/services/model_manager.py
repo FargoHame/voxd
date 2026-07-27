@@ -31,8 +31,15 @@ class ModelManager:
         self._loaded_engine: SpeechEngine | None = None
         self._loaded_model: InstalledModel | None = None
 
-    def available_models(self, engine: str) -> list:
-        return self._engines.get(engine).available_models()
+    def available_models(self, engine: str | None = None) -> list:
+        if engine is not None:
+            return self._engines.get(engine).available_models()
+
+        models = []
+        for speech_engine in self._engines.list():
+            models.extend(speech_engine.available_models())
+
+        return models
 
     def installed_models(self) -> list[InstalledModel]:
         return self._models.list()
@@ -117,6 +124,21 @@ class ModelManager:
         self._models.add(installed_model)
 
         return final_dir
+
+    def install(self, model_name: str) -> Path:
+        """Install a model by resolving its owning engine from the catalog."""
+
+        manifest = self.get_manifest(model_name)
+        return self.prepare_install(manifest.engine, model_name)
+
+    def get_manifest(self, model_name: str) -> ModelManifest:
+        for engine in self._engines.list():
+            try:
+                return engine.get_manifest(model_name)
+            except ValueError:
+                continue
+
+        raise ValueError(f"Unknown model: {model_name}")
 
     def load(
         self,
