@@ -4,7 +4,6 @@ from pathlib import Path
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-
 ROOT_DIR = Path(__file__).resolve().parents[2]
 DATA_DIR = ROOT_DIR / "data"
 
@@ -16,6 +15,7 @@ class Settings(BaseSettings):
     port: int = Field(default=11435)
     api_version: str = Field(default="v1")
     log_level: str = Field(default="INFO")
+    device: str = Field(default="cpu")
 
     database_path: Path = DATA_DIR / "voxd.db"
     cache_dir: Path = DATA_DIR / "cache"

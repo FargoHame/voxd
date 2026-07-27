@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from voxd.engines.base import SpeechEngine
+from voxd.core.settings import settings
 from voxd.manifests.base import ManifestProvider
 from voxd.manifests.local import LocalManifestProvider
 from voxd.models.audio import AudioResult, SpeechRequest
@@ -56,7 +57,7 @@ class VoiceHubEngine(SpeechEngine):
         self._tts_model = AutoInferenceModel.from_pretrained(
             model_type=model.model_name,
             model_path=str(model.install_path),
-            device="cpu",
+            device=settings.device,
         )
 
         self._loaded_model = model
