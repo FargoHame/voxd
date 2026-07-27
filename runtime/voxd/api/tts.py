@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request, Response
+from fastapi import APIRouter, HTTPException, Request, Response
 
 from voxd.models.audio import SpeechRequest
 
@@ -12,7 +12,19 @@ def synthesize(
 ) -> Response:
     """Synthesize speech from text using the currently loaded model."""
 
-    audio = request.app.state.runtime.synthesize(body)
+    runtime = request.app.state.runtime
+
+    try:
+        if body.model is not None:
+            current = runtime.current()
+            if current is None or current.model_name != body.model:
+                runtime.load(body.model)
+
+        audio = runtime.synthesize(body)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except RuntimeError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
 
     return Response(
         content=audio.data,

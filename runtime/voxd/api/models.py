@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, HTTPException, Request
+
+from voxd.models.api import PullModelRequest
 
 router = APIRouter(tags=["Models"])
 
@@ -32,15 +34,19 @@ def list_models(
 @router.post("/models/pull")
 def pull_model(
     request: Request,
-    body: dict,
+    body: PullModelRequest,
 ) -> dict:
     """Download and install a model from the catalog."""
 
-    model_name = body["model"]
-    request.app.state.model_manager.prepare_install(
-        "voicehub",
-        model_name,
-    )
+    model_name = body.model
+
+    try:
+        request.app.state.model_manager.prepare_install(
+            "voicehub",
+            model_name,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
 
     return {
         "status": "ok",

@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, HTTPException, Request
 
-from voxd.services.runtime_manager import RuntimeManager
 from voxd.models.runtime import LoadRuntimeRequest
+from voxd.services.runtime_manager import RuntimeManager
+
 router = APIRouter(
     prefix="/runtime",
     tags=["runtime"],
@@ -29,6 +30,7 @@ def runtime_status(request: Request):
         "engine": model.engine,
     }
 
+
 @router.post("/load")
 def load_runtime(
     request: Request,
@@ -36,7 +38,12 @@ def load_runtime(
 ):
     runtime: RuntimeManager = request.app.state.runtime
 
-    runtime.load(body.model)
+    try:
+        runtime.load(body.model)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except RuntimeError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
 
     model = runtime.current()
 
@@ -45,6 +52,7 @@ def load_runtime(
         "model": model.model_name,
         "engine": model.engine,
     }
+
 
 @router.post("/unload")
 def unload_runtime(request: Request):
