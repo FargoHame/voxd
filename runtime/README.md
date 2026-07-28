@@ -24,7 +24,39 @@ Hubaks runs open-source text-to-speech models behind one local CLI, HTTP API, an
 | `piper-lessac-low` | Piper | CPU-friendly ONNX voice |
 | `piper-amy-low` | Piper | CPU-friendly ONNX voice |
 
-## Install
+## Install With pipx
+
+`pipx` is the recommended install path for Hubaks because it creates an isolated Python environment and exposes a global `hubaks` command. Hubaks currently targets Python 3.11.
+
+After Hubaks is published:
+
+```powershell
+pipx install --python 3.11 "hubaks[engines]"
+hubaks web
+```
+
+From a local release wheel:
+
+```powershell
+uv build
+pipx install --python 3.11 ..\dist\hubaks-1.5.1-py3-none-any.whl
+pipx inject hubaks kokoro piper-tts
+hubaks web
+```
+
+If pipx reports a local `uv` backend version mismatch, use pipx with the pip backend:
+
+```powershell
+pipx install --backend pip --python 3.11 ..\dist\hubaks-1.5.1-py3-none-any.whl
+```
+
+If Python 3.11 is not registered with the Windows launcher, pass the full Python path:
+
+```powershell
+pipx install --python C:\Path\To\Python311\python.exe ..\dist\hubaks-1.5.1-py3-none-any.whl
+```
+
+## Install From Source
 
 From the repository:
 
