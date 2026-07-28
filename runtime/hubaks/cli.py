@@ -1,5 +1,7 @@
 from importlib import metadata, util
 from pathlib import Path
+from threading import Timer
+import webbrowser
 
 import httpx
 import typer
@@ -19,6 +21,10 @@ def base_url() -> str:
     return f"http://{settings.host}:{settings.port}/{settings.api_version}"
 
 
+def web_url() -> str:
+    return f"http://{settings.host}:{settings.port}"
+
+
 @cli.command()
 def serve(
     reload: bool = typer.Option(
@@ -26,8 +32,19 @@ def serve(
         "--reload",
         help="Enable auto reload.",
     ),
+    open_browser: bool = typer.Option(
+        False,
+        "--open",
+        help="Open the bundled web UI in the default browser.",
+    ),
 ):
-    """Start the Hubaks runtime."""
+    """Start the Hubaks runtime and bundled web UI."""
+
+    typer.echo(f"Hubaks web UI: {web_url()}")
+    typer.echo(f"Hubaks API: {base_url()}")
+
+    if open_browser:
+        Timer(1.0, lambda: webbrowser.open(web_url())).start()
 
     uvicorn.run(
         "hubaks.main:app",
@@ -35,6 +52,19 @@ def serve(
         port=settings.port,
         reload=reload,
     )
+
+
+@cli.command()
+def web(
+    reload: bool = typer.Option(
+        False,
+        "--reload",
+        help="Enable auto reload.",
+    ),
+):
+    """Start the Hubaks runtime and open the bundled web UI."""
+
+    serve(reload=reload, open_browser=True)
 
 
 @cli.command()

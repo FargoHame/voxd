@@ -54,10 +54,12 @@ Build artifacts are written to `dist/`:
 ```powershell
 cd runtime
 uv build
-uv pip install ..\dist\hubaks-1.5.0-py3-none-any.whl
+uv pip install ..\dist\hubaks-1.5.1-py3-none-any.whl
 ```
 
 ## Start The Runtime
+
+One command starts both the local API and the bundled web UI:
 
 ```powershell
 hubaks serve
@@ -67,6 +69,18 @@ Then open:
 
 ```text
 http://127.0.0.1:11435
+```
+
+To open the UI automatically:
+
+```powershell
+hubaks web
+```
+
+or:
+
+```powershell
+hubaks serve --open
 ```
 
 ## Generate Speech
@@ -137,6 +151,7 @@ hubaks doctor
 hubaks list
 hubaks pull kokoro
 hubaks serve
+hubaks web
 hubaks run kokoro "Hello from Hubaks" --voice af_heart --output hello.wav
 hubaks ps
 hubaks load kokoro

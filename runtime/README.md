@@ -35,6 +35,8 @@ uv pip install -e ".[engines]"
 
 ## Start The Runtime
 
+One command starts both the local API and the bundled web UI:
+
 ```powershell
 hubaks serve
 ```
@@ -43,6 +45,18 @@ Open the web UI:
 
 ```text
 http://127.0.0.1:11435
+```
+
+To open the UI automatically:
+
+```powershell
+hubaks web
+```
+
+or:
+
+```powershell
+hubaks serve --open
 ```
 
 ## Generate Speech
@@ -113,6 +127,7 @@ hubaks doctor
 hubaks list
 hubaks pull kokoro
 hubaks serve
+hubaks web
 hubaks run kokoro "Hello from Hubaks" --voice af_heart --output hello.wav
 hubaks ps
 hubaks load kokoro
