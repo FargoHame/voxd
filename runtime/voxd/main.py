@@ -1,4 +1,7 @@
+from pathlib import Path
+
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 
 from voxd import __version__
 from voxd.api.health import router as health_router
@@ -48,6 +51,14 @@ def create_app() -> FastAPI:
         models_router,
         prefix=api_prefix,
     )
+
+    web_dist = Path(__file__).parent / "web" / "dist"
+    if web_dist.exists():
+        app.mount(
+            "/",
+            StaticFiles(directory=web_dist, html=True),
+            name="web",
+        )
 
     return app
 

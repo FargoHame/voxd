@@ -24,6 +24,12 @@ Start the server:
 voxd serve
 ```
 
+Open the local web UI:
+
+```text
+http://127.0.0.1:11435
+```
+
 Generate speech through the running server:
 
 ```powershell
@@ -75,6 +81,29 @@ POST /v1/audio/speech
 ```
 
 The endpoint returns encoded WAV bytes.
+
+## Web UI
+
+The web UI is served by the runtime when `runtime/voxd/web/dist` exists. It has
+two workflows:
+
+- Voice Generation: works with the currently verified Kokoro and Piper models.
+- Voice Copying: visible now, ready for Chatterbox or another cloning-capable
+  backend when one is verified.
+
+For frontend development:
+
+```powershell
+cd ..\apps\web
+npm install
+npm run dev
+```
+
+For production assets:
+
+```powershell
+npm run build
+```
 
 ## Configuration
 

@@ -57,6 +57,10 @@ Next:
 
 Current verified model count: four models across two backend engines.
 
+The web UI is now part of the runtime surface. It exposes separate Voice
+Generation and Voice Copying tabs, with Voice Copying disabled until a verified
+cloning-capable backend is available.
+
 Later candidates:
 
 - `orpheus`: expressive conversational speech.

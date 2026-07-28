@@ -15,7 +15,7 @@ def test_version_uses_runtime_version():
     result = CliRunner().invoke(cli, ["version"])
 
     assert result.exit_code == 0
-    assert "Voxd Runtime 1.2.0" in result.output
+    assert "Voxd Runtime 1.4.0" in result.output
 
 
 def test_list_shows_available_models():
