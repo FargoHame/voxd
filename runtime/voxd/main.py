@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
 from voxd import __version__
+from voxd.api.generations import router as generations_router
 from voxd.api.health import router as health_router
 from voxd.api.models import router as models_router
 from voxd.api.runtime import router as runtime_router
@@ -49,6 +50,11 @@ def create_app() -> FastAPI:
 
     app.include_router(
         models_router,
+        prefix=api_prefix,
+    )
+
+    app.include_router(
+        generations_router,
         prefix=api_prefix,
     )
 

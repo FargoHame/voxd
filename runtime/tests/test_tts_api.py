@@ -25,9 +25,18 @@ class FakeRuntime:
         )
 
 
+class FakeStore:
+    def save(self, request, audio, model):
+        class Record:
+            id = "abc123"
+
+        return Record()
+
+
 def test_audio_speech_returns_engine_audio():
     app = FastAPI()
     app.state.runtime = FakeRuntime()
+    app.state.generation_store = FakeStore()
     app.include_router(router, prefix="/v1")
 
     response = TestClient(app).post(
@@ -39,6 +48,7 @@ def test_audio_speech_returns_engine_audio():
     assert response.content == b"RIFFfake"
     assert response.headers["content-type"] == "audio/wav"
     assert response.headers["x-voxd-sample-rate"] == "24000"
+    assert response.headers["x-voxd-generation-id"] == "abc123"
 
 
 def test_audio_speech_loads_requested_model():

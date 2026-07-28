@@ -1,4 +1,4 @@
-import type { RuntimeStatus, VoxdModel } from "../types/api";
+import type { Generation, RuntimeStatus, VoxdModel } from "../types/api";
 
 const API_PREFIX = "/v1";
 
@@ -20,7 +20,7 @@ export async function synthesizeSpeech(payload: {
   input: string;
   voice?: string;
   speed?: number;
-}): Promise<Blob> {
+}): Promise<{ blob: Blob; generationId: string | null }> {
   const response = await fetch(`${API_PREFIX}/audio/speech`, {
     method: "POST",
     headers: {
@@ -29,7 +29,33 @@ export async function synthesizeSpeech(payload: {
     body: JSON.stringify(payload),
   });
   await assertOk(response);
-  return response.blob();
+  return {
+    blob: await response.blob(),
+    generationId: response.headers.get("X-Voxd-Generation-Id"),
+  };
+}
+
+export async function getGenerations(): Promise<Generation[]> {
+  const response = await fetch(`${API_PREFIX}/generations`);
+  await assertOk(response);
+  const data = (await response.json()) as { generations: Generation[] };
+  return data.generations;
+}
+
+export async function renameGeneration(id: string, name: string): Promise<Generation> {
+  const response = await fetch(`${API_PREFIX}/generations/${id}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ name }),
+  });
+  await assertOk(response);
+  return (await response.json()) as Generation;
+}
+
+export function generationAudioUrl(id: string): string {
+  return `${API_PREFIX}/generations/${id}/audio`;
 }
 
 async function assertOk(response: Response): Promise<void> {

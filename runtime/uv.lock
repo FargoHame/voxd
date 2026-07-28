@@ -504,7 +504,7 @@ wheels = [
 
 [[package]]
 name = "voxd"
-version = "1.4.0"
+version = "1.4.5"
 source = { editable = "." }
 dependencies = [
     { name = "fastapi" },

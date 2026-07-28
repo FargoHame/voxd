@@ -16,9 +16,14 @@ export type RuntimeStatus = {
 
 export type Generation = {
   id: string;
+  name: string;
   model: string;
+  engine: string | null;
   text: string;
-  url: string;
-  createdAt: string;
-  bytes: number;
+  filename: string;
+  media_type: string;
+  sample_rate: number;
+  size_bytes: number;
+  duration_seconds: number | null;
+  created_at: string;
 };

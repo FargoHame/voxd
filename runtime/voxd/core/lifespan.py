@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from voxd.core.logger import logger
+from voxd.services.generation_store import GenerationStore
 from voxd.services.model_manager import ModelManager
 from voxd.services.runtime_manager import RuntimeManager
 
@@ -18,6 +19,7 @@ async def lifespan(app: FastAPI):
 
     app.state.runtime = RuntimeManager(model_manager=model_manager)
     app.state.model_manager = model_manager
+    app.state.generation_store = GenerationStore()
 
     logger.info("Runtime ready.")
 

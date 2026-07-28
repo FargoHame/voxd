@@ -295,6 +295,8 @@ textarea {
 
 .history {
   min-height: 420px;
+  max-height: calc(100vh - 116px);
+  overflow-y: auto;
 }
 
 .emptyState {
@@ -308,7 +310,7 @@ textarea {
 
 .generationRow {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: 10px;
   padding: 12px 0;
   border-bottom: 1px solid #edf0eb;
@@ -320,7 +322,23 @@ textarea {
 }
 
 .generationRow audio {
+  grid-column: 1 / -1;
   width: 100%;
+}
+
+.clipActions {
+  display: flex;
+  gap: 8px;
+  align-items: start;
+}
+
+.renameInput {
+  width: 100%;
+  height: 34px;
+  border: 1px solid #cfd5cf;
+  border-radius: 7px;
+  padding: 0 10px;
+  color: #202124;
 }
 
 .uploadZone {

@@ -26,10 +26,17 @@ def synthesize(
     except RuntimeError as exc:
         raise HTTPException(status_code=409, detail=str(exc)) from exc
 
-    return Response(
+    response = Response(
         content=audio.data,
         media_type=audio.media_type,
         headers={
             "X-Voxd-Sample-Rate": str(audio.sample_rate),
         },
     )
+
+    store = getattr(request.app.state, "generation_store", None)
+    if store is not None:
+        record = store.save(body, audio, runtime.current())
+        response.headers["X-Voxd-Generation-Id"] = record.id
+
+    return response

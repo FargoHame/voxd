@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   Activity,
+  Check,
   Copy,
   Download,
+  Edit3,
   Loader2,
   Mic,
   Play,
@@ -10,9 +12,17 @@ import {
   Upload,
   Volume2,
   Waves,
+  X,
 } from "lucide-react";
 
-import { getModels, getRuntime, synthesizeSpeech } from "../lib/api";
+import {
+  generationAudioUrl,
+  getGenerations,
+  getModels,
+  getRuntime,
+  renameGeneration,
+  synthesizeSpeech,
+} from "../lib/api";
 import type { Generation, RuntimeStatus, VoxdModel } from "../types/api";
 
 const PRESET_VOICES: Record<string, string[]> = {
@@ -67,6 +77,7 @@ export function App() {
       const [nextModels, nextRuntime] = await Promise.all([getModels(), getRuntime()]);
       setModels(nextModels);
       setRuntime(nextRuntime);
+      setGenerations(await getGenerations());
 
       const firstInstalled = nextModels.find((item) => item.installed);
       if (firstInstalled && !nextModels.some((item) => item.name === selectedModel)) {
@@ -87,25 +98,12 @@ export function App() {
     setError(null);
 
     try {
-      const blob = await synthesizeSpeech({
+      await synthesizeSpeech({
         model: selectedModel,
         input: text.trim(),
         voice: supportsVoice(model) ? selectedVoice : undefined,
         speed: supportsVoice(model) ? speed : undefined,
       });
-      const url = URL.createObjectURL(blob);
-      const id = crypto.randomUUID();
-      setGenerations((items) => [
-        {
-          id,
-          model: selectedModel,
-          text: text.trim(),
-          url,
-          createdAt: new Date().toLocaleTimeString(),
-          bytes: blob.size,
-        },
-        ...items,
-      ]);
       await refresh();
     } catch (nextError) {
       setError(nextError instanceof Error ? nextError.message : "Speech generation failed.");
@@ -200,6 +198,12 @@ export function App() {
             text={text}
             voices={voices}
             onGenerate={() => void generate()}
+            onRename={async (id, name) => {
+              const renamed = await renameGeneration(id, name);
+              setGenerations((items) =>
+                items.map((item) => (item.id === id ? renamed : item)),
+              );
+            }}
           />
         ) : (
           <VoiceCopying copyingModels={copyingModels} />
@@ -225,6 +229,7 @@ function VoiceGeneration(props: {
   text: string;
   voices: string[];
   onGenerate: () => void;
+  onRename: (id: string, name: string) => Promise<void>;
 }) {
   return (
     <div className="contentGrid">
@@ -303,7 +308,9 @@ function VoiceGeneration(props: {
         {props.generations.length === 0 ? (
           <div className="emptyState">No clips generated in this session.</div>
         ) : (
-          props.generations.map((item) => <GenerationRow generation={item} key={item.id} />)
+          props.generations.map((item) => (
+            <GenerationRow generation={item} key={item.id} onRename={props.onRename} />
+          ))
         )}
       </section>
     </div>
@@ -355,20 +362,67 @@ function VoiceCopying(props: { copyingModels: VoxdModel[] }) {
   );
 }
 
-function GenerationRow({ generation }: { generation: Generation }) {
+function GenerationRow({
+  generation,
+  onRename,
+}: {
+  generation: Generation;
+  onRename: (id: string, name: string) => Promise<void>;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [name, setName] = useState(generation.name);
+  const [saving, setSaving] = useState(false);
+  const url = generationAudioUrl(generation.id);
+
+  async function saveName() {
+    setSaving(true);
+    try {
+      await onRename(generation.id, name);
+      setEditing(false);
+    } finally {
+      setSaving(false);
+    }
+  }
+
   return (
     <article className="generationRow">
       <div>
-        <strong>{generation.model}</strong>
+        {editing ? (
+          <input
+            aria-label="Generation name"
+            className="renameInput"
+            onChange={(event) => setName(event.target.value)}
+            value={name}
+          />
+        ) : (
+          <strong>{generation.name}</strong>
+        )}
         <p>{generation.text}</p>
         <small>
-          {generation.createdAt} · {Math.round(generation.bytes / 1024)} KB
+          {generation.model} · {new Date(generation.created_at).toLocaleString()} ·{" "}
+          {Math.round(generation.size_bytes / 1024)} KB
         </small>
       </div>
-      <audio controls src={generation.url} />
-      <a className="iconButton" download={`${generation.model}-${generation.id}.wav`} href={generation.url}>
-        <Download size={16} />
-      </a>
+      <audio controls src={url} />
+      <div className="clipActions">
+        {editing ? (
+          <>
+            <button className="iconButton" disabled={saving} onClick={() => void saveName()} type="button">
+              <Check size={16} />
+            </button>
+            <button className="iconButton" onClick={() => setEditing(false)} type="button">
+              <X size={16} />
+            </button>
+          </>
+        ) : (
+          <button className="iconButton" onClick={() => setEditing(true)} type="button">
+            <Edit3 size={16} />
+          </button>
+        )}
+        <a className="iconButton" download={generation.filename} href={url}>
+          <Download size={16} />
+        </a>
+      </div>
     </article>
   );
 }

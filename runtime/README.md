@@ -90,6 +90,8 @@ two workflows:
 - Voice Generation: works with the currently verified Kokoro and Piper models.
 - Voice Copying: visible now, ready for Chatterbox or another cloning-capable
   backend when one is verified.
+- Generated clips are persisted in `runtime/data/outputs/generations`, reload
+  into the history panel, and can be renamed from the web UI.
 
 For frontend development:
 
