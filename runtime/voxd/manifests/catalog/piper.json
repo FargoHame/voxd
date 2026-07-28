@@ -1,0 +1,31 @@
+{
+  "models": [
+    {
+      "name": "piper-lessac-low",
+      "engine": "piper",
+      "description": "Small CPU-friendly American English Piper voice",
+      "version": "1.0",
+      "license": "MIT",
+      "homepage": "https://huggingface.co/rhasspy/piper-voices",
+      "options": {
+        "voice": "en_US-lessac-low",
+        "model_file": "en_US-lessac-low.onnx",
+        "config_file": "en_US-lessac-low.onnx.json"
+      },
+      "files": [
+        {
+          "filename": "en_US-lessac-low.onnx",
+          "url": "https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/lessac/low/en_US-lessac-low.onnx?download=true",
+          "sha256": "F7D01DDE371555732C4C314111AC79672B1A5CE2FC19266AB42178FD8DF7F375",
+          "size_bytes": 63201294
+        },
+        {
+          "filename": "en_US-lessac-low.onnx.json",
+          "url": "https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/lessac/low/en_US-lessac-low.onnx.json?download=true",
+          "sha256": "45754DFDEBB3B8661C3FC564713772DEEC6E064FEEB5B4E9594857DC7305193A",
+          "size_bytes": 4882
+        }
+      ]
+    }
+  ]
+}

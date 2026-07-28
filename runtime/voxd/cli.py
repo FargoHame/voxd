@@ -54,7 +54,7 @@ def doctor():
     typer.echo(f"Database: {settings.database_path}")
     typer.echo(f"Models: {settings.models_dir}")
 
-    for package in ["fastapi", "uvicorn", "typer", "voicehub", "kokoro", "piper"]:
+    for package in ["fastapi", "uvicorn", "typer", "kokoro", "piper", "voicehub"]:
         spec = util.find_spec(package)
         status = "installed" if spec is not None else "missing"
         location = spec.origin if spec is not None else ""

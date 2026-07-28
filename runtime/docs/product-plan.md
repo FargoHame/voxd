@@ -45,10 +45,13 @@ Every engine must return encoded audio bytes through `AudioResult`.
 
 ## Engine Roadmap
 
-Start with:
+Implemented:
 
 - `kokoro`: default fast local model.
 - `piper`: CPU and edge fallback.
+
+Next:
+
 - `chatterbox`: higher-quality expressive and voice-cloning backend.
 - `voicehub`: optional broad-coverage compatibility backend.
 

@@ -14,6 +14,7 @@ Install the current Kokoro backend:
 
 ```powershell
 uv pip install kokoro
+uv pip install piper-tts
 ```
 
 Start the server:
@@ -29,6 +30,8 @@ voxd pull kokoro
 voxd run kokoro "Hello from Voxd" --voice af_heart --output hello.wav
 voxd pull kokoro-british
 voxd run kokoro-british "Hello from Voxd" --output hello-british.wav
+voxd pull piper-lessac-low
+voxd run piper-lessac-low "Hello from Piper through Voxd" --output hello-piper.wav
 ```
 
 Check the local environment:
