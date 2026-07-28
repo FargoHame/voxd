@@ -130,7 +130,7 @@ uv run ruff check .
 Build the web UI from the repository root:
 
 ```powershell
-cd apps\web
+cd ..\frontend
 npm install
 npm run build
 ```

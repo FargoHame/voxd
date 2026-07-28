@@ -166,7 +166,7 @@ uv run ruff check .
 Web UI:
 
 ```powershell
-cd apps\web
+cd frontend
 npm install
 npm run build
 ```
