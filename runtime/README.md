@@ -28,6 +28,15 @@ Hubaks runs open-source text-to-speech models behind one local CLI, HTTP API, an
 
 `pipx` is the recommended install path for Hubaks because it creates an isolated Python environment and exposes a global `hubaks` command. Hubaks currently targets Python 3.11.
 
+On Windows, install pipx first if the `pipx` command is not available:
+
+```powershell
+py -m pip install --user pipx
+py -m pipx ensurepath
+```
+
+Close and reopen PowerShell after `ensurepath`.
+
 After Hubaks is published:
 
 ```powershell
