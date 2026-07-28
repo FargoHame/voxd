@@ -4,6 +4,10 @@ Ollama-style local text-to-speech runtime.
 
 Hubaks runs open-source text-to-speech models behind one local CLI, HTTP API, and web UI. It is built for people who want to pull voices, serve them locally, generate speech, and keep generated audio on their own machine.
 
+## Status
+
+Hubaks is currently packaged from source and as local release artifacts. The Python package is named `hubaks`, the CLI command is `hubaks`, and the built wheel includes the runtime, model manifests, and web UI.
+
 ## Why Hubaks
 
 Most TTS projects expose a model library or a demo script. Hubaks is the runtime layer around those models:
@@ -41,6 +45,16 @@ git clone https://github.com/fargohame/hubaks.git
 cd hubaks\runtime
 uv venv --python 3.11
 uv pip install -e ".[engines]"
+```
+
+## Install From Local Build
+
+Build artifacts are written to `dist/`:
+
+```powershell
+cd runtime
+uv build
+uv pip install ..\dist\hubaks-1.5.0-py3-none-any.whl
 ```
 
 ## Start The Runtime
@@ -154,6 +168,17 @@ Rename request:
 ```
 
 ## Development
+
+Repository layout:
+
+```text
+frontend/              React web UI source
+runtime/               Python runtime package
+runtime/hubaks/        Hubaks server, CLI, engines, API, and bundled web assets
+runtime/hubaks/web/    Production web UI files included in the Python package
+scripts/               Project scripts
+dist/                  Local Python build artifacts
+```
 
 Backend:
 
