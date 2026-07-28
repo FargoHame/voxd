@@ -2,10 +2,10 @@ import sys
 import types
 from datetime import datetime
 
-from voxd.constants.install_status import InstallStatus
-from voxd.engines.kokoro import KokoroEngine
-from voxd.models.audio import SpeechRequest
-from voxd.models.installed_model import InstalledModel
+from hubaks.constants.install_status import InstallStatus
+from hubaks.engines.kokoro import KokoroEngine
+from hubaks.models.audio import SpeechRequest
+from hubaks.models.installed_model import InstalledModel
 
 
 class FakePipeline:

@@ -23,28 +23,28 @@ import {
   renameGeneration,
   synthesizeSpeech,
 } from "../lib/api";
-import type { Generation, RuntimeStatus, VoxdModel } from "../types/api";
+import type { Generation, RuntimeStatus, HubaksModel } from "../types/api";
 
 const PRESET_VOICES: Record<string, string[]> = {
   kokoro: ["af_heart", "af_bella", "am_adam", "am_michael"],
   "kokoro-british": ["bf_emma", "bf_isabella", "bm_george", "bm_lewis"],
 };
 
-function supportsVoice(model: VoxdModel | undefined): boolean {
+function supportsVoice(model: HubaksModel | undefined): boolean {
   return model?.engine === "kokoro";
 }
 
-function supportsVoiceCopying(model: VoxdModel): boolean {
+function supportsVoiceCopying(model: HubaksModel): boolean {
   return model.engine === "chatterbox" || model.name.includes("chatterbox");
 }
 
 export function App() {
   const [activeTab, setActiveTab] = useState<"generation" | "copying">("generation");
-  const [models, setModels] = useState<VoxdModel[]>([]);
+  const [models, setModels] = useState<HubaksModel[]>([]);
   const [runtime, setRuntime] = useState<RuntimeStatus | null>(null);
   const [selectedModel, setSelectedModel] = useState("kokoro");
   const [selectedVoice, setSelectedVoice] = useState("af_heart");
-  const [text, setText] = useState("Hello from Voxd. Local speech synthesis is running.");
+  const [text, setText] = useState("Hello from Hubaks. Local speech synthesis is running.");
   const [speed, setSpeed] = useState(1);
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -84,7 +84,7 @@ export function App() {
         setSelectedModel(firstInstalled.name);
       }
     } catch (nextError) {
-      setError(nextError instanceof Error ? nextError.message : "Unable to reach Voxd.");
+      setError(nextError instanceof Error ? nextError.message : "Unable to reach Hubaks.");
     }
   }
 
@@ -116,9 +116,9 @@ export function App() {
     <main className="shell">
       <aside className="sidebar" aria-label="Runtime">
         <div className="brand">
-          <div className="brandMark">V</div>
+          <div className="brandMark">H</div>
           <div>
-            <h1>Voxd</h1>
+            <h1>Hubaks</h1>
             <p>Local TTS runtime</p>
           </div>
         </div>
@@ -160,7 +160,7 @@ export function App() {
 
       <section className="workspace">
         <header className="topbar">
-          <div className="tabs" role="tablist" aria-label="Voxd workflows">
+          <div className="tabs" role="tablist" aria-label="Hubaks workflows">
             <button
               className={activeTab === "generation" ? "tab active" : "tab"}
               onClick={() => setActiveTab("generation")}
@@ -217,8 +217,8 @@ function VoiceGeneration(props: {
   error: string | null;
   generating: boolean;
   generations: Generation[];
-  installedModels: VoxdModel[];
-  model: VoxdModel | undefined;
+  installedModels: HubaksModel[];
+  model: HubaksModel | undefined;
   selectedModel: string;
   selectedVoice: string;
   setSelectedModel: (model: string) => void;
@@ -306,7 +306,7 @@ function VoiceGeneration(props: {
           Generated Audio
         </div>
         {props.generations.length === 0 ? (
-          <div className="emptyState">No clips generated in this session.</div>
+          <div className="emptyState">No generated clips yet.</div>
         ) : (
           props.generations.map((item) => (
             <GenerationRow generation={item} key={item.id} onRename={props.onRename} />
@@ -317,7 +317,7 @@ function VoiceGeneration(props: {
   );
 }
 
-function VoiceCopying(props: { copyingModels: VoxdModel[] }) {
+function VoiceCopying(props: { copyingModels: HubaksModel[] }) {
   const enabled = props.copyingModels.length > 0;
 
   return (
@@ -399,7 +399,7 @@ function GenerationRow({
         )}
         <p>{generation.text}</p>
         <small>
-          {generation.model} · {new Date(generation.created_at).toLocaleString()} ·{" "}
+          {generation.model} - {new Date(generation.created_at).toLocaleString()} -{" "}
           {Math.round(generation.size_bytes / 1024)} KB
         </small>
       </div>

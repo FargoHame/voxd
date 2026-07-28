@@ -2,10 +2,10 @@ import sys
 import types
 from datetime import datetime
 
-from voxd.constants.install_status import InstallStatus
-from voxd.engines.piper import PiperEngine
-from voxd.models.audio import SpeechRequest
-from voxd.models.installed_model import InstalledModel
+from hubaks.constants.install_status import InstallStatus
+from hubaks.engines.piper import PiperEngine
+from hubaks.models.audio import SpeechRequest
+from hubaks.models.installed_model import InstalledModel
 
 
 class FakeConfig:

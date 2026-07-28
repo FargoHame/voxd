@@ -3,12 +3,12 @@ from datetime import datetime
 
 import pytest
 
-from voxd.constants.install_status import InstallStatus
-from voxd.core.settings import settings
-from voxd.models.installed_model import InstalledModel
-from voxd.models.model_file import ModelFile
-from voxd.models.model_manifest import ModelManifest
-from voxd.services.model_manager import ModelManager
+from hubaks.constants.install_status import InstallStatus
+from hubaks.core.settings import settings
+from hubaks.models.installed_model import InstalledModel
+from hubaks.models.model_file import ModelFile
+from hubaks.models.model_manifest import ModelManifest
+from hubaks.services.model_manager import ModelManager
 
 
 class FakeEngine:

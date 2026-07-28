@@ -1,9 +1,33 @@
 [project]
-name = "voxd"
-version = "1.4.5"
-description = "A local runtime for modern speech AI."
+name = "hubaks"
+version = "1.5.0"
+description = "Ollama-style local text-to-speech runtime."
 readme = "README.md"
 requires-python = ">=3.11,<3.12"
+license = "MIT"
+authors = [
+    { name = "fargohame" },
+]
+keywords = [
+    "text-to-speech",
+    "tts",
+    "local-ai",
+    "speech-synthesis",
+    "kokoro",
+    "piper",
+    "openai-compatible",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Framework :: FastAPI",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Multimedia :: Sound/Audio :: Speech",
+]
 
 dependencies = [
     "fastapi>=0.116.0",
@@ -15,16 +39,50 @@ dependencies = [
     "pydantic-settings>=2.10.0",
 ]
 
+[project.optional-dependencies]
+kokoro = [
+    "kokoro",
+]
+piper = [
+    "piper-tts",
+]
+engines = [
+    "kokoro",
+    "piper-tts",
+]
+
+[project.urls]
+Homepage = "https://github.com/fargohame/hubaks"
+Repository = "https://github.com/fargohame/hubaks"
+Issues = "https://github.com/fargohame/hubaks/issues"
+
 [project.scripts]
-voxd = "voxd.cli:cli"
+hubaks = "hubaks.cli:cli"
 
 [dependency-groups]
 dev = [
-    "pytest>=8.4.0",
-    "ruff>=0.12.0",
+    "pytest>=8.4.0,<9",
+    "ruff>=0.12.0,<0.13",
     "black>=25.1.0",
 ]
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["hubaks"]
+artifacts = [
+    "hubaks/manifests/catalog/*.json",
+    "hubaks/web/dist/**",
+]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "hubaks",
+    "README.md",
+    "pyproject.toml",
+]
+
+[tool.hatch.build.targets.sdist.force-include]
+"hubaks/web/dist" = "hubaks/web/dist"

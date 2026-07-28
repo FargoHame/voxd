@@ -16,8 +16,8 @@ env/
 # Build artifacts
 build/
 dist/
-!runtime/voxd/web/dist/
-!runtime/voxd/web/dist/**
+!runtime/hubaks/web/dist/
+!runtime/hubaks/web/dist/**
 *.egg-info/
 
 # Testing

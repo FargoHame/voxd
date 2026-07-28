@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-from voxd.api.tts import router
-from voxd.models.audio import AudioResult, SpeechRequest
+from hubaks.api.tts import router
+from hubaks.models.audio import AudioResult, SpeechRequest
 
 
 class FakeRuntime:
@@ -47,8 +47,8 @@ def test_audio_speech_returns_engine_audio():
     assert response.status_code == 200
     assert response.content == b"RIFFfake"
     assert response.headers["content-type"] == "audio/wav"
-    assert response.headers["x-voxd-sample-rate"] == "24000"
-    assert response.headers["x-voxd-generation-id"] == "abc123"
+    assert response.headers["x-hubaks-sample-rate"] == "24000"
+    assert response.headers["x-hubaks-generation-id"] == "abc123"
 
 
 def test_audio_speech_loads_requested_model():

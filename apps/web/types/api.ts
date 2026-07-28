@@ -1,4 +1,4 @@
-export type VoxdModel = {
+export type HubaksModel = {
   name: string;
   engine: string;
   description: string;

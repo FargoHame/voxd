@@ -1,11 +1,11 @@
-import type { Generation, RuntimeStatus, VoxdModel } from "../types/api";
+import type { Generation, RuntimeStatus, HubaksModel } from "../types/api";
 
 const API_PREFIX = "/v1";
 
-export async function getModels(): Promise<VoxdModel[]> {
+export async function getModels(): Promise<HubaksModel[]> {
   const response = await fetch(`${API_PREFIX}/models`);
   await assertOk(response);
-  const data = (await response.json()) as { models: VoxdModel[] };
+  const data = (await response.json()) as { models: HubaksModel[] };
   return data.models;
 }
 
@@ -31,7 +31,7 @@ export async function synthesizeSpeech(payload: {
   await assertOk(response);
   return {
     blob: await response.blob(),
-    generationId: response.headers.get("X-Voxd-Generation-Id"),
+    generationId: response.headers.get("X-Hubaks-Generation-Id"),
   };
 }
 

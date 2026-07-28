@@ -1,7 +1,7 @@
 import pytest
 
-from voxd.models.audio import AudioResult, SpeechRequest
-from voxd.services.generation_store import GenerationStore
+from hubaks.models.audio import AudioResult, SpeechRequest
+from hubaks.services.generation_store import GenerationStore
 
 
 def test_generation_store_saves_lists_and_renames(tmp_path):

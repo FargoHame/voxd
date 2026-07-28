@@ -1,7 +1,7 @@
 import wave
 from io import BytesIO
 
-from voxd.services.audio import encode_wav
+from hubaks.services.audio import encode_wav
 
 
 def test_encode_wav_returns_valid_wav_bytes():

@@ -1,51 +1,21 @@
-# Voxd Runtime
+# Hubaks
 
-Voxd is a local text-to-speech runtime with a CLI and HTTP API.
+Ollama-style local text-to-speech runtime.
 
-## Quickstart
+Hubaks runs open-source text-to-speech models behind one local CLI, HTTP API, and web UI. It is built for people who want to pull voices, serve them locally, generate speech, and keep generated audio on their own machine.
 
-Install the runtime package from this directory:
+## Current Features
 
-```powershell
-uv venv --python 3.11
-uv pip install -e .
-```
-
-Install the current Kokoro backend:
-
-```powershell
-uv pip install kokoro
-uv pip install piper-tts
-```
-
-Start the server:
-
-```powershell
-voxd serve
-```
-
-Open the local web UI:
-
-```text
-http://127.0.0.1:11435
-```
-
-Generate speech through the running server:
-
-```powershell
-voxd pull kokoro
-voxd run kokoro "Hello from Voxd" --voice af_heart --output hello.wav
-voxd pull kokoro-british
-voxd run kokoro-british "Hello from Voxd" --output hello-british.wav
-voxd pull piper-lessac-low
-voxd run piper-lessac-low "Hello from Piper through Voxd" --output hello-piper.wav
-voxd pull piper-amy-low
-voxd run piper-amy-low "Hello from another Piper voice" --output hello-piper-amy.wav
-```
+- FastAPI runtime server.
+- Typer CLI.
+- Built-in React web UI served by the runtime.
+- OpenAI-style speech endpoint: `POST /v1/audio/speech`.
+- Persistent generated audio history.
+- Rename generated audio clips from the web UI or API.
+- Local model catalog and install workflow.
+- Verified Kokoro and Piper engine adapters.
 
 ## Supported Models
-
-The current verified runtime supports four local models across two backends:
 
 | Model | Engine | Notes |
 | --- | --- | --- |
@@ -54,17 +24,35 @@ The current verified runtime supports four local models across two backends:
 | `piper-lessac-low` | Piper | CPU-friendly ONNX voice |
 | `piper-amy-low` | Piper | CPU-friendly ONNX voice |
 
-Chatterbox is a candidate backend, but it is not included in this release. Its
-package install did not complete reliably in the Python 3.11 runtime during
-verification.
+## Install
 
-Check the local environment:
+From the repository:
 
 ```powershell
-voxd doctor
+uv venv --python 3.11
+uv pip install -e ".[engines]"
 ```
 
-## API
+## Start The Runtime
+
+```powershell
+hubaks serve
+```
+
+Open the web UI:
+
+```text
+http://127.0.0.1:11435
+```
+
+## Generate Speech
+
+```powershell
+hubaks pull kokoro
+hubaks run kokoro "Hello from Hubaks" --voice af_heart --output hello.wav
+```
+
+API:
 
 ```http
 POST /v1/audio/speech
@@ -73,63 +61,80 @@ POST /v1/audio/speech
 ```json
 {
   "model": "kokoro",
-  "input": "Hello from Voxd",
+  "input": "Hello from Hubaks",
   "voice": "af_heart",
   "speed": 1.0,
   "format": "wav"
 }
 ```
 
-The endpoint returns encoded WAV bytes.
+The endpoint returns WAV audio bytes.
 
 ## Web UI
 
-The web UI is served by the runtime when `runtime/voxd/web/dist` exists. It has
-two workflows:
+The runtime serves the built web UI when `hubaks/web/dist` exists. The current UI includes voice generation, runtime status, installed models, generated audio history, playback, download, and inline rename.
 
-- Voice Generation: works with the currently verified Kokoro and Piper models.
-- Voice Copying: visible now, ready for Chatterbox or another cloning-capable
-  backend when one is verified.
-- Generated clips are persisted in `runtime/data/outputs/generations`, reload
-  into the history panel, and can be renamed from the web UI.
+## Local Data
 
-For frontend development:
+Hubaks stores runtime data in a per-user app data directory by default:
+
+| Platform | Default |
+| --- | --- |
+| Windows | `%LOCALAPPDATA%\Hubaks` |
+| macOS | `~/Library/Application Support/Hubaks` |
+| Linux | `~/.local/share/hubaks` |
+
+Override the data directory with:
 
 ```powershell
-cd ..\apps\web
-npm install
-npm run dev
+$env:HUBAKS_HOME = "D:\hubaks-data"
 ```
 
-For production assets:
+Generated audio clips are stored under:
 
-```powershell
-npm run build
+```text
+<Hubaks data directory>/outputs/generations
 ```
 
 ## Configuration
 
-Environment variables use the `VOXD_` prefix.
+Environment variables use the `HUBAKS_` prefix.
 
 ```powershell
-$env:VOXD_HOST = "127.0.0.1"
-$env:VOXD_PORT = "11435"
-$env:VOXD_DEVICE = "cpu"
+$env:HUBAKS_HOST = "127.0.0.1"
+$env:HUBAKS_PORT = "11435"
+$env:HUBAKS_DEVICE = "cpu"
 ```
 
-## Engine Dependencies
-
-Voxd keeps backend engines optional so the base runtime remains lightweight. The
-recommended product packaging is to expose these as optional extras once each
-adapter is implemented and locked:
+## CLI
 
 ```powershell
-pip install "voxd[kokoro]"
-pip install "voxd[piper]"
-pip install "voxd[chatterbox]"
-pip install "voxd[voicehub]"
+hubaks doctor
+hubaks list
+hubaks pull kokoro
+hubaks serve
+hubaks run kokoro "Hello from Hubaks" --voice af_heart --output hello.wav
+hubaks ps
+hubaks load kokoro
+hubaks unload
+hubaks rm kokoro
 ```
 
-VoiceHub can remain available as a compatibility backend. If PyPI is behind the
-repository API required by Voxd, install it from a pinned Git commit until PyPI
-catches up.
+## Development
+
+```powershell
+uv run pytest
+uv run ruff check .
+```
+
+Build the web UI from the repository root:
+
+```powershell
+cd apps\web
+npm install
+npm run build
+```
+
+## License
+
+MIT

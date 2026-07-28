@@ -1,9 +1,9 @@
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-from voxd.api.generations import router
-from voxd.models.audio import AudioResult, SpeechRequest
-from voxd.services.generation_store import GenerationStore
+from hubaks.api.generations import router
+from hubaks.models.audio import AudioResult, SpeechRequest
+from hubaks.services.generation_store import GenerationStore
 
 
 def test_generations_api_lists_audio_and_renames(tmp_path):
