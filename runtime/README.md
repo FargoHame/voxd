@@ -14,6 +14,7 @@ Hubaks runs open-source text-to-speech models behind one local CLI, HTTP API, an
 - Rename generated audio clips from the web UI or API.
 - Local model catalog and install workflow.
 - Verified Kokoro and Piper engine adapters.
+- Chatterbox engine adapter with voice prompting support.
 
 ## Supported Models
 
@@ -23,6 +24,9 @@ Hubaks runs open-source text-to-speech models behind one local CLI, HTTP API, an
 | `kokoro-british` | Kokoro | British English Kokoro preset |
 | `piper-lessac-low` | Piper | CPU-friendly ONNX voice |
 | `piper-amy-low` | Piper | CPU-friendly ONNX voice |
+| `chatterbox` | Chatterbox | English TTS with voice prompting |
+| `chatterbox-multilingual` | Chatterbox | Multilingual TTS with voice prompting |
+| `chatterbox-turbo` | Chatterbox | Faster English TTS with voice prompting |
 
 ## Install With pipx
 
@@ -48,7 +52,7 @@ From a local release wheel:
 
 ```powershell
 uv build
-pipx install --python 3.11 ..\dist\hubaks-1.5.1-py3-none-any.whl
+pipx install --python 3.11 ..\dist\hubaks-1.6.0-py3-none-any.whl
 pipx inject hubaks kokoro piper-tts
 hubaks web
 ```
@@ -56,13 +60,13 @@ hubaks web
 If pipx reports a local `uv` backend version mismatch, use pipx with the pip backend:
 
 ```powershell
-pipx install --backend pip --python 3.11 ..\dist\hubaks-1.5.1-py3-none-any.whl
+pipx install --backend pip --python 3.11 ..\dist\hubaks-1.6.0-py3-none-any.whl
 ```
 
 If Python 3.11 is not registered with the Windows launcher, pass the full Python path:
 
 ```powershell
-pipx install --python C:\Path\To\Python311\python.exe ..\dist\hubaks-1.5.1-py3-none-any.whl
+pipx install --python C:\Path\To\Python311\python.exe ..\dist\hubaks-1.6.0-py3-none-any.whl
 ```
 
 ## Install From Source
@@ -167,9 +171,11 @@ $env:HUBAKS_DEVICE = "cpu"
 hubaks doctor
 hubaks list
 hubaks pull kokoro
+hubaks pull chatterbox
 hubaks serve
 hubaks web
 hubaks run kokoro "Hello from Hubaks" --voice af_heart --output hello.wav
+hubaks run chatterbox "Hello in a prompted voice" --audio-prompt voice.wav --output chatterbox.wav
 hubaks ps
 hubaks load kokoro
 hubaks unload

@@ -84,7 +84,15 @@ def doctor():
     typer.echo(f"Database: {settings.database_path}")
     typer.echo(f"Models: {settings.models_dir}")
 
-    for package in ["fastapi", "uvicorn", "typer", "kokoro", "piper", "voicehub"]:
+    for package in [
+        "fastapi",
+        "uvicorn",
+        "typer",
+        "kokoro",
+        "piper",
+        "chatterbox",
+        "voicehub",
+    ]:
         spec = util.find_spec(package)
         status = "installed" if spec is not None else "missing"
         location = spec.origin if spec is not None else ""
@@ -159,6 +167,16 @@ def run(
         "--speed",
         help="Speech speed supported by the selected model.",
     ),
+    audio_prompt: Path | None = typer.Option(
+        None,
+        "--audio-prompt",
+        help="Reference WAV path for engines that support voice prompting.",
+    ),
+    language: str | None = typer.Option(
+        None,
+        "--language",
+        help="Language ID for multilingual engines.",
+    ),
 ):
     """Generate speech with a local runtime server."""
 
@@ -171,6 +189,10 @@ def run(
         payload["voice"] = voice
     if speed is not None:
         payload["speed"] = speed
+    if audio_prompt is not None:
+        payload.setdefault("options", {})["audio_prompt_path"] = str(audio_prompt)
+    if language is not None:
+        payload.setdefault("options", {})["language_id"] = language
 
     response = _request(
         "POST",

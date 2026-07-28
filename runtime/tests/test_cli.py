@@ -15,7 +15,7 @@ def test_version_uses_runtime_version():
     result = CliRunner().invoke(cli, ["version"])
 
     assert result.exit_code == 0
-    assert "Hubaks Runtime 1.5.1" in result.output
+    assert "Hubaks Runtime 1.6.0" in result.output
 
 
 def test_web_command_is_registered():
@@ -33,3 +33,6 @@ def test_list_shows_available_models():
     assert "kokoro-british" in result.output
     assert "piper-lessac-low" in result.output
     assert "piper-amy-low" in result.output
+    assert "chatterbox" in result.output
+    assert "chatterbox-multilingual" in result.output
+    assert "chatterbox-turbo" in result.output

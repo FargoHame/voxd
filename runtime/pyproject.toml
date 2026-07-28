@@ -1,6 +1,6 @@
 [project]
 name = "hubaks"
-version = "1.5.1"
+version = "1.6.0"
 description = "Ollama-style local text-to-speech runtime."
 readme = "README.md"
 requires-python = ">=3.11,<3.12"
@@ -46,7 +46,11 @@ kokoro = [
 piper = [
     "piper-tts",
 ]
+chatterbox = [
+    "chatterbox-tts==0.1.7",
+]
 engines = [
+    "chatterbox-tts==0.1.7",
     "kokoro",
     "piper-tts",
 ]

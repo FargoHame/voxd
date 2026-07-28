@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from hubaks.engines.chatterbox import ChatterboxEngine
 from hubaks.engines.base import SpeechEngine
 from hubaks.engines.kokoro import KokoroEngine
 from hubaks.engines.piper import PiperEngine
@@ -13,6 +14,7 @@ class EngineRegistry:
         self._engines: dict[str, SpeechEngine] = {}
         self.register(KokoroEngine())
         self.register(PiperEngine())
+        self.register(ChatterboxEngine())
         self.register(VoiceHubEngine())
 
     def register(self, engine: SpeechEngine) -> None:

@@ -1,0 +1,44 @@
+{
+  "models": [
+    {
+      "name": "chatterbox",
+      "engine": "chatterbox",
+      "description": "Resemble AI Chatterbox English TTS with voice prompting",
+      "version": "0.1.7",
+      "license": "MIT",
+      "homepage": "https://github.com/resemble-ai/chatterbox",
+      "options": {
+        "model_kind": "english",
+        "sample_rate": 24000
+      },
+      "files": []
+    },
+    {
+      "name": "chatterbox-multilingual",
+      "engine": "chatterbox",
+      "description": "Resemble AI Chatterbox multilingual TTS with voice prompting",
+      "version": "0.1.7",
+      "license": "MIT",
+      "homepage": "https://github.com/resemble-ai/chatterbox",
+      "options": {
+        "model_kind": "multilingual",
+        "language_id": "en",
+        "sample_rate": 24000
+      },
+      "files": []
+    },
+    {
+      "name": "chatterbox-turbo",
+      "engine": "chatterbox",
+      "description": "Resemble AI Chatterbox Turbo TTS with voice prompting",
+      "version": "0.1.7",
+      "license": "MIT",
+      "homepage": "https://github.com/resemble-ai/chatterbox",
+      "options": {
+        "model_kind": "turbo",
+        "sample_rate": 24000
+      },
+      "files": []
+    }
+  ]
+}
