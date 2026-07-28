@@ -27,6 +27,8 @@ Generate speech through the running server:
 ```powershell
 voxd pull kokoro
 voxd run kokoro "Hello from Voxd" --voice af_heart --output hello.wav
+voxd pull kokoro-british
+voxd run kokoro-british "Hello from Voxd" --output hello-british.wav
 ```
 
 Check the local environment:

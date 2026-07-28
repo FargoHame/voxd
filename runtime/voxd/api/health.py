@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 
+from voxd import __version__
 from voxd.models.health import HealthResponse
 
 router = APIRouter(tags=["Health"])
@@ -14,5 +15,5 @@ async def health() -> HealthResponse:
 
     return HealthResponse(
         status="healthy",
-        version="0.1.0",
+        version=__version__,
     )

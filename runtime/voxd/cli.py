@@ -5,6 +5,7 @@ import httpx
 import typer
 import uvicorn
 
+from voxd import __version__
 from voxd.core.settings import settings
 from voxd.services.model_manager import ModelManager
 
@@ -40,7 +41,7 @@ def serve(
 def version():
     """Print runtime version."""
 
-    typer.echo("Voxd Runtime 0.1.0")
+    typer.echo(f"Voxd Runtime {__version__}")
 
 
 @cli.command()
@@ -72,8 +73,7 @@ def doctor():
 def ps():
     """Show the currently loaded model."""
 
-    response = httpx.get(f"{base_url()}/runtime")
-    response.raise_for_status()
+    response = _request("GET", "/runtime")
 
     data = response.json()
 
@@ -87,13 +87,13 @@ def ps():
 def load(model: str):
     """Load a model."""
 
-    response = httpx.post(
-        f"{base_url()}/runtime/load",
+    response = _request(
+        "POST",
+        "/runtime/load",
         json={
             "model": model,
         },
     )
-    response.raise_for_status()
 
     data = response.json()
 
@@ -104,8 +104,7 @@ def load(model: str):
 def unload():
     """Unload the current model."""
 
-    response = httpx.post(f"{base_url()}/runtime/unload")
-    response.raise_for_status()
+    _request("POST", "/runtime/unload")
 
     typer.echo("Runtime unloaded.")
 
@@ -143,12 +142,12 @@ def run(
     if speed is not None:
         payload["speed"] = speed
 
-    response = httpx.post(
-        f"{base_url()}/audio/speech",
+    response = _request(
+        "POST",
+        "/audio/speech",
         json=payload,
         timeout=None,
     )
-    response.raise_for_status()
 
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_bytes(response.content)
@@ -167,17 +166,24 @@ def pull(model: str):
 
 @cli.command()
 def list():
-    """List installed models."""
+    """List available models and install status."""
 
     mgr = ModelManager()
-    models = mgr.installed_models()
+    available = mgr.available_models()
+    installed = {m.model_name: m for m in mgr.installed_models()}
 
-    if not models:
-        typer.echo("No models installed.")
+    if not available:
+        typer.echo("No models available.")
         return
 
-    for m in models:
-        typer.echo(f"  {m.model_name:<20} {m.engine:<10} {m.size_bytes:>10,} bytes")
+    for model in available:
+        marker = "*" if model.name in installed else " "
+        size = (
+            installed[model.name].size_bytes
+            if model.name in installed
+            else model.size_bytes
+        )
+        typer.echo(f"{marker} {model.name:<20} {model.engine:<10} {size:>10,} bytes")
 
 
 @cli.command()
@@ -194,6 +200,31 @@ def _package_version(package: str) -> str:
         return metadata.version(package)
     except metadata.PackageNotFoundError:
         return ""
+
+
+def _request(method: str, path: str, **kwargs) -> httpx.Response:
+    try:
+        response = httpx.request(method, f"{base_url()}{path}", **kwargs)
+        response.raise_for_status()
+        return response
+    except httpx.ConnectError as exc:
+        typer.echo(
+            "Voxd server is not reachable. Start it with `voxd serve`.", err=True
+        )
+        raise typer.Exit(1) from exc
+    except httpx.HTTPStatusError as exc:
+        detail = _error_detail(exc.response)
+        typer.echo(f"Request failed: {detail}", err=True)
+        raise typer.Exit(1) from exc
+
+
+def _error_detail(response: httpx.Response) -> str:
+    try:
+        data = response.json()
+    except ValueError:
+        return response.text
+
+    return data.get("detail", response.text)
 
 
 if __name__ == "__main__":

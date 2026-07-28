@@ -45,3 +45,49 @@ def test_kokoro_engine_synthesizes_wav(monkeypatch, tmp_path):
     assert audio.media_type == "audio/wav"
     assert audio.sample_rate == 24000
     assert audio.data.startswith(b"RIFF")
+
+
+def test_kokoro_engine_uses_manifest_default_voice(monkeypatch, tmp_path):
+    calls = []
+
+    class BritishPipeline(FakePipeline):
+        def __call__(self, text, voice, speed, split_pattern):
+            calls.append(
+                {
+                    "lang_code": self.lang_code,
+                    "voice": voice,
+                    "speed": speed,
+                    "split_pattern": split_pattern,
+                }
+            )
+            yield text, "phonemes", [0.0]
+
+    fake_module = types.ModuleType("kokoro")
+    fake_module.KPipeline = BritishPipeline
+    monkeypatch.setitem(sys.modules, "kokoro", fake_module)
+
+    engine = KokoroEngine()
+    model = InstalledModel(
+        model_name="kokoro-british",
+        engine="kokoro",
+        version="1.0",
+        install_path=tmp_path / "kokoro-british",
+        size_bytes=0,
+        manifest_version="1.0",
+        installed_at=datetime.now(),
+        last_used=None,
+        status=InstallStatus.INSTALLED,
+    )
+    manifest = engine.get_manifest("kokoro-british")
+
+    engine.load(model, manifest)
+    engine.synthesize(SpeechRequest(input="hello"))
+
+    assert calls == [
+        {
+            "lang_code": "b",
+            "voice": "bf_emma",
+            "speed": 1.0,
+            "split_pattern": r"\n+",
+        }
+    ]

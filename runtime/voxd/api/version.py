@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 
+from voxd import __version__
 from voxd.models.version import VersionResponse
 
 router = APIRouter(tags=["Version"])
@@ -13,5 +14,5 @@ async def version() -> VersionResponse:
     """Runtime version endpoint."""
 
     return VersionResponse(
-        version="0.1.0",
+        version=__version__,
     )

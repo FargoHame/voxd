@@ -13,6 +13,20 @@
         "sample_rate": 24000
       },
       "files": []
+    },
+    {
+      "name": "kokoro-british",
+      "engine": "kokoro",
+      "description": "Fast lightweight British English TTS voice preset",
+      "version": "1.0",
+      "license": "Apache-2.0",
+      "homepage": "https://huggingface.co/hexgrad/Kokoro-82M",
+      "options": {
+        "lang_code": "b",
+        "default_voice": "bf_emma",
+        "sample_rate": 24000
+      },
+      "files": []
     }
   ]
 }

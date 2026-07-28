@@ -18,6 +18,7 @@ class KokoroEngine(SpeechEngine):
 
     def __init__(self, manifest_provider: ManifestProvider | None = None):
         self._loaded_model: InstalledModel | None = None
+        self._loaded_manifest: ModelManifest | None = None
         self._pipeline = None
         self._manifest_provider = manifest_provider or LocalManifestProvider(
             Path(__file__).parent.parent / "manifests" / "catalog" / "kokoro.json"
@@ -49,18 +50,25 @@ class KokoroEngine(SpeechEngine):
         lang_code = manifest.options.get("lang_code", "a")
         self._pipeline = KPipeline(lang_code=lang_code)
         self._loaded_model = model
+        self._loaded_manifest = manifest
 
     def unload(self) -> None:
         self._pipeline = None
         self._loaded_model = None
+        self._loaded_manifest = None
 
     def synthesize(self, request: SpeechRequest) -> AudioResult:
         if self._pipeline is None:
             raise RuntimeError("No model loaded.")
 
-        voice = request.voice or "af_heart"
+        options = self._loaded_manifest.options if self._loaded_manifest else {}
+        voice = request.voice or options.get("default_voice", "af_heart")
         speed = request.speed or 1.0
-        split_pattern = request.options.get("split_pattern", r"\n+")
+        split_pattern = request.options.get(
+            "split_pattern",
+            options.get("split_pattern", r"\n+"),
+        )
+        sample_rate = options.get("sample_rate", 24000)
 
         generator = self._pipeline(
             request.input,
@@ -73,7 +81,7 @@ class KokoroEngine(SpeechEngine):
         if not audios:
             raise RuntimeError("Kokoro did not generate any audio.")
 
-        return encode_wav(audios, sample_rate=24000)
+        return encode_wav(audios, sample_rate=sample_rate)
 
     def capabilities(self) -> dict:
         return {
