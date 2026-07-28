@@ -42,7 +42,7 @@ class ModelManager:
         return models
 
     def installed_models(self) -> list[InstalledModel]:
-        return self._models.list()
+        return [self._reconcile_model(model) for model in self._models.list()]
 
     def is_installed(self, model_name: str) -> bool:
         return self._models.exists(model_name)
@@ -51,7 +51,8 @@ class ModelManager:
         self,
         model_name: str,
     ) -> InstalledModel | None:
-        return self._models.get(model_name)
+        model = self._models.get(model_name)
+        return self._reconcile_model(model) if model is not None else None
 
     def remove(self, model_name: str) -> None:
         """Remove an installed model from the registry and delete its files."""
@@ -129,6 +130,11 @@ class ModelManager:
         """Install a model by resolving its owning engine from the catalog."""
 
         manifest = self.get_manifest(model_name)
+
+        existing = self._models.get(model_name)
+        if existing is not None:
+            return self._reconcile_model(existing, manifest).install_path
+
         return self.prepare_install(manifest.engine, model_name)
 
     def get_manifest(self, model_name: str) -> ModelManifest:
@@ -164,9 +170,9 @@ class ModelManager:
         if model is None:
             raise ValueError(f"Model '{model_name}' is not installed.")
 
+        manifest = self.get_manifest(model.model_name)
+        model = self._reconcile_model(model, manifest)
         engine = self._engines.get(model.engine)
-
-        manifest = engine.get_manifest(model.model_name)
 
         engine.load(
             model=model,
@@ -207,3 +213,39 @@ class ModelManager:
     @staticmethod
     def _install_dir(model_name: str) -> Path:
         return settings.models_dir / model_name
+
+    def _reconcile_model(
+        self,
+        model: InstalledModel,
+        manifest: ModelManifest | None = None,
+    ) -> InstalledModel:
+        """Update installed metadata when the catalog changes engine ownership."""
+
+        if manifest is None:
+            try:
+                manifest = self.get_manifest(model.model_name)
+            except ValueError:
+                return model
+
+        changed = False
+
+        if model.engine != manifest.engine:
+            model.engine = manifest.engine
+            changed = True
+
+        if model.version != manifest.version:
+            model.version = manifest.version
+            changed = True
+
+        if model.manifest_version != manifest.version:
+            model.manifest_version = manifest.version
+            changed = True
+
+        if model.size_bytes != manifest.total_size:
+            model.size_bytes = manifest.total_size
+            changed = True
+
+        if changed:
+            self._models.update(model)
+
+        return model

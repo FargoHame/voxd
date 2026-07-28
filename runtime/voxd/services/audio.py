@@ -49,17 +49,14 @@ def _to_plain_audio(audio: Any) -> Any:
 
 
 def _iter_samples(audio: Any) -> Iterable[float | int]:
+    audio = _to_plain_audio(audio)
+
     if isinstance(audio, (bytes, bytearray)):
         raise TypeError("Raw bytes cannot be encoded as numeric audio samples.")
 
     if isinstance(audio, Iterable) and not isinstance(audio, (str, bytes, bytearray)):
         for item in audio:
-            if isinstance(item, Iterable) and not isinstance(
-                item, (str, bytes, bytearray)
-            ):
-                yield from _iter_samples(item)
-            else:
-                yield item
+            yield from _iter_samples(item)
         return
 
     yield audio

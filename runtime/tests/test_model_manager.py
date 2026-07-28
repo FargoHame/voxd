@@ -1,8 +1,11 @@
 from pathlib import Path
+from datetime import datetime
 
 import pytest
 
+from voxd.constants.install_status import InstallStatus
 from voxd.core.settings import settings
+from voxd.models.installed_model import InstalledModel
 from voxd.models.model_file import ModelFile
 from voxd.models.model_manifest import ModelManifest
 from voxd.services.model_manager import ModelManager
@@ -137,3 +140,36 @@ def test_install_resolves_engine_from_catalog(tmp_path, monkeypatch, manifest):
 
     assert install_dir == tmp_path / "models" / "demo"
     assert registry.get("demo").engine == "fake"
+
+
+def test_install_reconciles_existing_model_engine(tmp_path, monkeypatch, manifest):
+    monkeypatch.setattr(settings, "models_dir", tmp_path / "models")
+    install_path = tmp_path / "models" / "demo"
+
+    registry = FakeModelRegistry()
+    registry.add(
+        InstalledModel(
+            model_name="demo",
+            engine="old-engine",
+            version="old",
+            install_path=install_path,
+            size_bytes=99,
+            manifest_version="old",
+            installed_at=datetime.now(),
+            last_used=None,
+            status=InstallStatus.INSTALLED,
+        )
+    )
+    manager = ModelManager(
+        engine_registry=FakeEngineRegistry(manifest),
+        model_registry=registry,
+        downloader=FakeDownloader(tmp_path / "cache" / "downloads" / "demo"),
+    )
+
+    resolved_path = manager.install("demo")
+
+    model = registry.get("demo")
+    assert resolved_path == install_path
+    assert model.engine == "fake"
+    assert model.version == "1.0"
+    assert model.size_bytes == 5
