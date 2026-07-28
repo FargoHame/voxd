@@ -25,3 +25,4 @@ def test_list_shows_available_models():
     assert "kokoro" in result.output
     assert "kokoro-british" in result.output
     assert "piper-lessac-low" in result.output
+    assert "piper-amy-low" in result.output

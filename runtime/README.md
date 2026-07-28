@@ -32,6 +32,8 @@ voxd pull kokoro-british
 voxd run kokoro-british "Hello from Voxd" --output hello-british.wav
 voxd pull piper-lessac-low
 voxd run piper-lessac-low "Hello from Piper through Voxd" --output hello-piper.wav
+voxd pull piper-amy-low
+voxd run piper-amy-low "Hello from another Piper voice" --output hello-piper-amy.wav
 ```
 
 Check the local environment:

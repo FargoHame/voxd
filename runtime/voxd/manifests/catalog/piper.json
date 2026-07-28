@@ -26,6 +26,33 @@
           "size_bytes": 4882
         }
       ]
+    },
+    {
+      "name": "piper-amy-low",
+      "engine": "piper",
+      "description": "Small CPU-friendly American English Piper voice",
+      "version": "1.0",
+      "license": "MIT",
+      "homepage": "https://huggingface.co/rhasspy/piper-voices",
+      "options": {
+        "voice": "en_US-amy-low",
+        "model_file": "en_US-amy-low.onnx",
+        "config_file": "en_US-amy-low.onnx.json"
+      },
+      "files": [
+        {
+          "filename": "en_US-amy-low.onnx",
+          "url": "https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/amy/low/en_US-amy-low.onnx?download=true",
+          "sha256": "A5A91ABB7DE0F104358A25ADED480DDACF1FF0762886325886EC406A2E86AAB3",
+          "size_bytes": 63104526
+        },
+        {
+          "filename": "en_US-amy-low.onnx.json",
+          "url": "https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/amy/low/en_US-amy-low.onnx.json?download=true",
+          "sha256": "2250A9A605B8DC35A116717FADC5056695DD809E34A15D02F72A0F52D53D3EBB",
+          "size_bytes": 4164
+        }
+      ]
     }
   ]
 }
