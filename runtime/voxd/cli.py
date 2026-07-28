@@ -49,7 +49,7 @@ def doctor():
     """Show local runtime diagnostics."""
 
     typer.echo("Voxd doctor")
-    typer.echo("Python support: >=3.11,<3.14")
+    typer.echo("Python support: >=3.11,<3.12")
     typer.echo(f"API base URL: {base_url()}")
     typer.echo(f"Database: {settings.database_path}")
     typer.echo(f"Models: {settings.models_dir}")

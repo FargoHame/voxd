@@ -7,6 +7,7 @@ Voxd is a local text-to-speech runtime with a CLI and HTTP API.
 Install the runtime package from this directory:
 
 ```powershell
+uv venv --python 3.11
 uv pip install -e .
 ```
 
@@ -35,6 +36,21 @@ voxd run piper-lessac-low "Hello from Piper through Voxd" --output hello-piper.w
 voxd pull piper-amy-low
 voxd run piper-amy-low "Hello from another Piper voice" --output hello-piper-amy.wav
 ```
+
+## Supported Models
+
+The current verified runtime supports four local models across two backends:
+
+| Model | Engine | Notes |
+| --- | --- | --- |
+| `kokoro` | Kokoro | Default American English Kokoro preset |
+| `kokoro-british` | Kokoro | British English Kokoro preset |
+| `piper-lessac-low` | Piper | CPU-friendly ONNX voice |
+| `piper-amy-low` | Piper | CPU-friendly ONNX voice |
+
+Chatterbox is a candidate backend, but it is not included in this release. Its
+package install did not complete reliably in the Python 3.11 runtime during
+verification.
 
 Check the local environment:
 
